@@ -1,6 +1,9 @@
 # Ring-Us
 # A universal alarm clock with a syncing system.
 
+## Vision
+ Our vision is to make time management into a shared, collaborative activity. This application is mainly an alarm. However, by having the ability to share alarms, this application aims to help groups (whether they are students, remote teams, or families) to stay perfectly in sync. We aim to eliminate the struggles of manual coordination, creating a world where shared accountability is built into every tick of the clock, ensuring that when it’s time to act, everyone is ready to move together.
+
 ## Getting started
 1. **Download an IDE**: Any IDE will work including Visual Studio Code, Sublime Text, etc.
 2. **Download Git (if you haven't)**: Download here: https://git-scm.com/downloads. 
