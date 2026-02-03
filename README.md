@@ -9,5 +9,19 @@
 5. In terminal, change directory(cd) to the new folder and type the following: 
 ```bash
    git clone https://github.com/fastninja30/Ring-Us
+   cd Ring-Us
+   npm install
 ```
-6. idk
+6. Start the app in the `dev` environment:
+```bash
+npm start
+```
+
+## Packaging for Production
+
+To package apps for the local platform:
+
+```bash
+npm run package
+```
+
