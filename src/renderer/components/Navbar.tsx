@@ -44,7 +44,7 @@ export function Navbar() {
 
     return(
         <>
-            <AppBar position="fixed">
+            <AppBar position="fixed" sx={{backgroundColor: '#ff7300'}}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1}}>
                         RingUs

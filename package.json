@@ -106,7 +106,6 @@
     "@emotion/styled": "^11.14.1",
     "@fontsource/open-sans": "^5.2.7",
     "@mui/material": "^7.3.7",
-    "better-sqlite3": "^12.6.2",
     "electron-debug": "^4.1.0",
     "electron-log": "^5.3.2",
     "electron-updater": "^6.3.9",

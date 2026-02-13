@@ -1,7 +1,7 @@
 export function About() {
     return (
         <div>
-            <h1>About Page</h1>
+            <h1>About RingUs</h1>
             <p>Our vision is to make time management into a shared, collaborative activity. 
                 This application is mainly an alarm. 
                 However, by having the ability to share alarms, this application aims to help groups (whether they are students, remote teams, or families) to stay perfectly in sync. 
