@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { FaHamburger } from "react-icons/fa"
+import { GiAlarmClock } from "react-icons/gi";
 
 export function Navbar() {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -34,6 +34,11 @@ export function Navbar() {
                     <Typography>Book list</Typography>
                 </IconButton>
             </NavLink>
+            <NavLink to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <IconButton>
+                    <Typography>About</Typography>
+                </IconButton>
+            </NavLink>
         </>
     );
 
@@ -42,12 +47,12 @@ export function Navbar() {
             <AppBar position="fixed">
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1}}>
-                        Electron Book-Book List
+                        RingUs
                     </Typography>
                     {isMobile ? (
                         <>
                         <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
-                            <FaHamburger />
+                            <GiAlarmClock />
                         </IconButton>
                         <Drawer anchor="right" open={drawerOpen} onClick={() => toggleDrawer(false)}>
                             <List>

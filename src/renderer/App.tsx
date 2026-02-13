@@ -8,6 +8,7 @@ import './App.css';
 import { Navbar } from './components/Navbar';
 import { BookList } from './pages/BookList';
 import { Home } from './pages/Home';
+import { About } from './pages/About';
 
 
 
@@ -20,6 +21,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />}/>
           <Route path="/book-list" element={<BookList />}/>
+          <Route path="/about" element={<About />}/>
         </Routes>
       </div>
     </Router>
