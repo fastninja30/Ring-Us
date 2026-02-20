@@ -9,6 +9,7 @@ import { Navbar } from './components/Navbar';
 import { BookList } from './pages/BookList';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
+import { Clock } from './pages/Clock';
 
 const theme = createTheme({
   palette: {
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/" element={<Home />}/>
             <Route path="/book-list" element={<BookList />}/>
             <Route path="/about" element={<About />}/>
+            <Route path="/clock" element={<Clock />}/>
           </Routes>
         </div>
       </Router>
