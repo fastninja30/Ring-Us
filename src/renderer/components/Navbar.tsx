@@ -39,6 +39,11 @@ export function Navbar() {
                     <Typography>About</Typography>
                 </IconButton>
             </NavLink>
+            <NavLink to="/clock" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <IconButton>
+                    <Typography>Clock</Typography>
+                </IconButton>
+            </NavLink>
         </>
     );
 
