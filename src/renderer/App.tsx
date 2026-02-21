@@ -9,6 +9,7 @@ import { Navbar } from './components/Navbar';
 import { BookList } from './pages/BookList';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
+import { Login } from './pages/Login';
 
 const theme = createTheme({
   palette: {
@@ -28,14 +29,33 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <Router> 
         <CssBaseline />
-        <Navbar />
-        <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />}/>
-            <Route path="/book-list" element={<BookList />}/>
-            <Route path="/about" element={<About />}/>
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/" element={<Login />}/>
+          <Route path="/home" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <Home />
+              </div>
+            </>
+          }/>
+          <Route path="/book-list" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <BookList />
+              </div>
+            </>
+          }/>
+          <Route path="/about" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <About />
+              </div>
+            </>
+          }/>
+        </Routes>
       </Router>
     </ThemeProvider>
   );
