@@ -2,7 +2,7 @@
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import firebaseKeys from './../../../firebase-config.json';
+import firebaseKeys from '../../firebase-config.json';
 
 let app: FirebaseApp;
 
