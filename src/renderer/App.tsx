@@ -10,6 +10,7 @@ import { BookList } from './pages/BookList';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
 
 const theme = createTheme({
   palette: {
@@ -31,6 +32,7 @@ export default function App() {
         <CssBaseline />
         <Routes>
           <Route path="/" element={<Login />}/>
+          <Route path="/signup" element={<Signup />}/>
           <Route path="/home" element={
             <>
               <Navbar />

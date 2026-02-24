@@ -10,17 +10,19 @@ import {
   IconButton,
   InputAdornment,
 } from '@mui/material';
-import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock } from 'react-icons/io';
+import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock, IoMdPerson } from 'react-icons/io';
 
-export function Login() {
+export function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // Mock login - navigate to home page
+    // Mock signup - navigate to home page
     navigate('/home');
   };
 
@@ -59,14 +61,32 @@ export function Login() {
               mb: 1,
             }}
           >
-            Welcome!
+            Create Account
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Sign in to continue to Ring-Us
+            Join Ring-Us today
           </Typography>
         </Box>
 
         <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Full Name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoComplete="name"
+            sx={{ mb: 2.5 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IoMdPerson style={{ color: '#9e9e9e' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
           <TextField
             fullWidth
             label="Email Address"
@@ -92,8 +112,8 @@ export function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            autoComplete="current-password"
-            sx={{ mb: 1 }}
+            autoComplete="new-password"
+            sx={{ mb: 2.5 }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -115,19 +135,23 @@ export function Login() {
             }}
           />
 
-          <Box sx={{ textAlign: 'right', mb: 3 }}>
-            <Link
-              href="#"
-              underline="hover"
-              sx={{
-                color: 'text.secondary',
-                fontSize: '0.875rem',
-                '&:hover': { color: '#F4F3F2' },
-              }}
-            >
-              Forgot Password?
-            </Link>
-          </Box>
+          <TextField
+            fullWidth
+            label="Confirm Password"
+            type={showPassword ? 'text' : 'password'}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+            sx={{ mb: 2 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IoMdLock style={{ color: '#9e9e9e' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
 
           <Button
             type="submit"
@@ -145,14 +169,14 @@ export function Login() {
               mb: 2,
             }}
           >
-            Sign In
+            Sign Up
           </Button>
 
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Don't have an account?{' '}
+              Already have an account?{' '}
               <Link
-                href="/signup"
+                href="/"
                 underline="hover"
                 sx={{
                   color: '#ff7300',
@@ -160,7 +184,7 @@ export function Login() {
                   '&:hover': { color: '#e56700' },
                 }}
               >
-                Sign Up
+                Sign In
               </Link>
             </Typography>
           </Box>
