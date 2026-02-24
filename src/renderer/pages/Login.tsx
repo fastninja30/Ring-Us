@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -152,7 +152,8 @@ export function Login() {
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Don't have an account?{' '}
               <Link
-                href="/signup"
+                component={RouterLink}
+                to="/signup"
                 underline="hover"
                 sx={{
                   color: '#ff7300',
