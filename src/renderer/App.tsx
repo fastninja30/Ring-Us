@@ -10,6 +10,7 @@ import { BookList } from './pages/BookList';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Clock } from './pages/Clock';
+import { Settings } from './pages/Settings';
 
 const theme = createTheme({
   palette: {
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/book-list" element={<BookList />}/>
             <Route path="/about" element={<About />}/>
             <Route path="/clock" element={<Clock />}/>
+            <Route path="/settings" element={<Settings />}/>
           </Routes>
         </div>
       </Router>
