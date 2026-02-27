@@ -1,5 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material'; 
+import { Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
 import { IoMdClock } from "react-icons/io";
@@ -9,6 +9,8 @@ import { Navbar } from './components/Navbar';
 import { BookList } from './pages/BookList';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
+import { Clock } from './pages/Clock';
+import { Settings } from './pages/Settings';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 
@@ -28,7 +30,7 @@ const theme = createTheme({
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Router> 
+      <Router>
         <CssBaseline />
         <Routes>
           <Route path="/" element={<Login />}/>

@@ -11,7 +11,10 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { GiAlarmClock } from "react-icons/gi";
+import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
+import { FaHome } from "react-icons/fa";
+import { FaRegClock } from "react-icons/fa";
+import { FaGear } from "react-icons/fa6";
 
 export function Navbar() {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -26,7 +29,7 @@ export function Navbar() {
         <>
             <NavLink to="/home" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <IconButton>
-                    <Typography>Home</Typography>
+                    <Typography><FaHome /></Typography>
                 </IconButton>
             </NavLink>
             <NavLink to="/book-list" style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -37,6 +40,16 @@ export function Navbar() {
             <NavLink to="/about" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <IconButton>
                     <Typography>About</Typography>
+                </IconButton>
+            </NavLink>
+            <NavLink to="/clock" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <IconButton>
+                    <Typography><FaRegClock/></Typography>
+                </IconButton>
+            </NavLink>
+            <NavLink to="/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <IconButton>
+                    <Typography><FaGear /></Typography>
                 </IconButton>
             </NavLink>
         </>
@@ -52,7 +65,7 @@ export function Navbar() {
                     {isMobile ? (
                         <>
                         <IconButton color="inherit" onClick={() => toggleDrawer(true)}>
-                            <GiAlarmClock />
+                            <PiDotsThreeOutlineVerticalFill />
                         </IconButton>
                         <Drawer anchor="right" open={drawerOpen} onClick={() => toggleDrawer(false)}>
                             <List>
