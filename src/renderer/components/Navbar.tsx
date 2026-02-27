@@ -27,7 +27,7 @@ export function Navbar() {
 
     const menuItems = (
         <>
-            <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <NavLink to="/home" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <IconButton>
                     <Typography><FaHome /></Typography>
                 </IconButton>

@@ -1,5 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material'; 
+import { Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
 import { IoMdClock } from "react-icons/io";
@@ -11,6 +11,8 @@ import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Clock } from './pages/Clock';
 import { Settings } from './pages/Settings';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
 
 const theme = createTheme({
   palette: {
@@ -28,18 +30,36 @@ const theme = createTheme({
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Router> 
+      <Router>
         <CssBaseline />
-        <Navbar />
-        <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />}/>
-            <Route path="/book-list" element={<BookList />}/>
-            <Route path="/about" element={<About />}/>
-            <Route path="/clock" element={<Clock />}/>
-            <Route path="/settings" element={<Settings />}/>
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/" element={<Login />}/>
+          <Route path="/signup" element={<Signup />}/>
+          <Route path="/home" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <Home />
+              </div>
+            </>
+          }/>
+          <Route path="/book-list" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <BookList />
+              </div>
+            </>
+          }/>
+          <Route path="/about" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <About />
+              </div>
+            </>
+          }/>
+        </Routes>
       </Router>
     </ThemeProvider>
   );
