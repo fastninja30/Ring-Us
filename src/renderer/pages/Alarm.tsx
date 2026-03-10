@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -21,7 +21,7 @@ import {
   Checkbox,
   Switch,
 } from '@mui/material';
-import { IoMdAdd, IoMdTrash, IoMdAlarm } from 'react-icons/io';
+import { IoMdAdd, IoMdTrash, IoMdAlarm, IoMdNotifications } from 'react-icons/io';
 
 interface AlarmData {
   id: string;
@@ -56,14 +56,48 @@ function saveAlarms(alarms: AlarmData[]) {
   localStorage.setItem('ringus-alarms', JSON.stringify(alarms));
 }
 
+// Generate an alarm tone using Web Audio API
+function playAlarmSound(audioContextRef: React.MutableRefObject<AudioContext | null>) {
+  try {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContext();
+    }
+    const ctx = audioContextRef.current;
+
+    const playBeep = (startTime: number, freq: number) => {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      oscillator.frequency.value = freq;
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.3, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+      oscillator.start(startTime);
+      oscillator.stop(startTime + 0.3);
+    };
+
+    const now = ctx.currentTime;
+    for (let i = 0; i < 3; i++) {
+      playBeep(now + i * 0.6, 880);
+      playBeep(now + i * 0.6 + 0.3, 1100);
+    }
+  } catch {
+    // Audio not available
+  }
+}
+
 export function Alarm() {
   const [alarms, setAlarms] = useState<AlarmData[]>(loadAlarms);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [firingAlarm, setFiringAlarm] = useState<AlarmData | null>(null);
   const [newHour, setNewHour] = useState('08');
   const [newMinute, setNewMinute] = useState('00');
   const [newLabel, setNewLabel] = useState('');
   const [newDays, setNewDays] = useState<number[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const firedAlarmsRef = useRef<Set<string>>(new Set());
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const is24Hour = localStorage.getItem('settings-is24Hour') === 'true';
 
@@ -73,6 +107,71 @@ export function Alarm() {
       setCurrentTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Check alarms every second
+  const checkAlarms = useCallback(() => {
+    const now = currentTime;
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentDay = now.getDay();
+    const timeKey = `${currentHour}:${currentMinute}`;
+
+    alarms.forEach((alarm) => {
+      if (!alarm.enabled) return;
+
+      const alarmFiredKey = `${alarm.id}-${timeKey}`;
+      if (firedAlarmsRef.current.has(alarmFiredKey)) return;
+
+      if (alarm.hour === currentHour && alarm.minute === currentMinute) {
+        const shouldFire = alarm.days.length === 0 || alarm.days.includes(currentDay);
+        if (!shouldFire) return;
+
+        firedAlarmsRef.current.add(alarmFiredKey);
+        setFiringAlarm(alarm);
+
+        // Play alarm sound
+        playAlarmSound(audioContextRef);
+
+        // Send native notification
+        if (Notification.permission === 'granted') {
+          new Notification('Ring-Us Alarm', {
+            body: alarm.label || `Alarm - ${formatTime(alarm.hour, alarm.minute, is24Hour)}`,
+            requireInteraction: true,
+          });
+        }
+
+        // Disable one-time alarms after firing
+        if (alarm.days.length === 0) {
+          setAlarms((prev) => {
+            const updated = prev.map((a) =>
+              a.id === alarm.id ? { ...a, enabled: false } : a,
+            );
+            saveAlarms(updated);
+            return updated;
+          });
+        }
+      }
+    });
+  }, [currentTime, alarms, is24Hour]);
+
+  useEffect(() => {
+    checkAlarms();
+  }, [checkAlarms]);
+
+  // Clean up fired alarms set periodically
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      firedAlarmsRef.current.clear();
+    }, 120000);
+    return () => clearInterval(cleanup);
+  }, []);
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
   }, []);
 
   const handleAddAlarm = () => {
@@ -115,6 +214,10 @@ export function Alarm() {
     );
     setAlarms(updated);
     saveAlarms(updated);
+  };
+
+  const handleDismissAlarm = () => {
+    setFiringAlarm(null);
   };
 
   const handleToggleDay = (day: number) => {
@@ -351,6 +454,58 @@ export function Alarm() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Firing Alarm Dialog */}
+      <Dialog
+        open={firingAlarm !== null}
+        onClose={handleDismissAlarm}
+        PaperProps={{
+          sx: {
+            background: 'rgba(30, 30, 30, 0.95)',
+            minWidth: 350,
+            textAlign: 'center',
+          },
+        }}
+      >
+        <DialogContent sx={{ pt: 4 }}>
+          <IoMdNotifications
+            style={{
+              fontSize: 64,
+              color: '#ff7300',
+              animation: 'shake 0.5s ease-in-out infinite',
+            }}
+          />
+          <Typography variant="h3" sx={{ mt: 2, fontWeight: 300 }}>
+            {firingAlarm && formatTime(firingAlarm.hour, firingAlarm.minute, is24Hour)}
+          </Typography>
+          <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
+            {firingAlarm?.label || 'Alarm'}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={handleDismissAlarm}
+            variant="contained"
+            size="large"
+            sx={{
+              backgroundColor: '#ff7300',
+              '&:hover': { backgroundColor: '#e56700' },
+              px: 4,
+            }}
+          >
+            Dismiss
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* CSS animation for alarm icon */}
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-15deg); }
+          75% { transform: rotate(15deg); }
+        }
+      `}</style>
     </Box>
   );
 }
