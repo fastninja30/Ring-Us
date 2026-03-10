@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -21,7 +21,12 @@ import {
   Checkbox,
   Switch,
 } from '@mui/material';
-import { IoMdAdd, IoMdTrash, IoMdAlarm, IoMdNotifications } from 'react-icons/io';
+import {
+  IoMdAdd,
+  IoMdTrash,
+  IoMdAlarm,
+  IoMdNotifications,
+} from 'react-icons/io';
 
 interface AlarmData {
   id: string;
@@ -57,7 +62,9 @@ function saveAlarms(alarms: AlarmData[]) {
 }
 
 // Generate an alarm tone using Web Audio API
-function playAlarmSound(audioContextRef: React.MutableRefObject<AudioContext | null>) {
+function playAlarmSound(
+  audioContextRef: React.MutableRefObject<AudioContext | null>,
+) {
   try {
     if (!audioContextRef.current) {
       audioContextRef.current = new AudioContext();
@@ -78,7 +85,7 @@ function playAlarmSound(audioContextRef: React.MutableRefObject<AudioContext | n
     };
 
     const now = ctx.currentTime;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i += 1) {
       playBeep(now + i * 0.6, 880);
       playBeep(now + i * 0.6 + 0.3, 1100);
     }

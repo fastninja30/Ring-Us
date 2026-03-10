@@ -1,6 +1,9 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
 import {
   Box,
   Button,
@@ -31,7 +34,11 @@ export function Login() {
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const { user } = userCredential;
 
       if (!user.emailVerified) {
@@ -89,7 +96,8 @@ export function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        background:
+          'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
       }}
     >
       <Paper
@@ -120,7 +128,11 @@ export function Login() {
           </Typography>
         </Box>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         {resetSent && (
           <Alert severity="success" sx={{ mb: 2 }}>
             Password reset email sent! Check your inbox.
@@ -166,7 +178,9 @@ export function Login() {
                   <IconButton
                     onClick={handleTogglePassword}
                     edge="end"
-                    aria-label={showPassword ? 'hide password' : 'show password'}
+                    aria-label={
+                      showPassword ? 'hide password' : 'show password'
+                    }
                     sx={{ color: 'text.secondary' }}
                   >
                     {showPassword ? <IoMdEyeOff /> : <IoMdEye />}
@@ -177,19 +191,25 @@ export function Login() {
           />
 
           <Box sx={{ textAlign: 'right', mb: 3 }}>
-            <Link
-              component="button"
-              type="button"
+            <Button
+              variant="text"
               onClick={handleForgotPassword}
-              underline="hover"
+              disableRipple
               sx={{
                 color: 'text.secondary',
                 fontSize: '0.875rem',
-                '&:hover': { color: '#F4F3F2' },
+                textTransform: 'none',
+                padding: 0,
+                minWidth: 'auto',
+                '&:hover': {
+                  color: '#F4F3F2',
+                  backgroundColor: 'transparent',
+                  textDecoration: 'underline',
+                },
               }}
             >
               Forgot Password?
-            </Link>
+            </Button>
           </Box>
 
           <Button
@@ -209,12 +229,16 @@ export function Login() {
               mb: 2,
             }}
           >
-            {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Sign In'}
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: '#fff' }} />
+            ) : (
+              'Sign In'
+            )}
           </Button>
 
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link
                 component={RouterLink}
                 to="/signup"

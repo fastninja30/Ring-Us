@@ -17,7 +17,13 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock, IoMdPerson } from 'react-icons/io';
+import {
+  IoMdEye,
+  IoMdEyeOff,
+  IoMdMail,
+  IoMdLock,
+  IoMdPerson,
+} from 'react-icons/io';
 import { auth } from '../firebaseConfig';
 
 export function Signup() {
@@ -47,7 +53,11 @@ export function Signup() {
     setLoading(true);
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const { user } = userCredential;
 
       await updateProfile(user, { displayName: name });
@@ -84,7 +94,8 @@ export function Signup() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        background:
+          'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
       }}
     >
       <Paper
@@ -115,7 +126,11 @@ export function Signup() {
           </Typography>
         </Box>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -175,7 +190,9 @@ export function Signup() {
                   <IconButton
                     onClick={handleTogglePassword}
                     edge="end"
-                    aria-label={showPassword ? 'hide password' : 'show password'}
+                    aria-label={
+                      showPassword ? 'hide password' : 'show password'
+                    }
                     sx={{ color: 'text.secondary' }}
                   >
                     {showPassword ? <IoMdEyeOff /> : <IoMdEye />}
@@ -220,7 +237,11 @@ export function Signup() {
               mb: 2,
             }}
           >
-            {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Sign Up'}
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: '#fff' }} />
+            ) : (
+              'Sign Up'
+            )}
           </Button>
 
           <Box sx={{ textAlign: 'center' }}>
