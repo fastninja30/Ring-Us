@@ -15,6 +15,10 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Divider,
+  Chip,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { IoMdAdd, IoMdTrash, IoMdAlarm } from 'react-icons/io';
 
@@ -22,8 +26,12 @@ interface AlarmData {
   id: string;
   hour: number;
   minute: number;
+  label: string;
   enabled: boolean;
+  days: number[]; // 0=Sun, 1=Mon, ... 6=Sat. Empty = one-time
 }
+
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function formatTime(hour: number, minute: number, is24Hour: boolean): string {
   if (is24Hour) {
@@ -52,6 +60,8 @@ export function Alarm() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newHour, setNewHour] = useState('08');
   const [newMinute, setNewMinute] = useState('00');
+  const [newLabel, setNewLabel] = useState('');
+  const [newDays, setNewDays] = useState<number[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const is24Hour = localStorage.getItem('settings-is24Hour') === 'true';
@@ -76,7 +86,9 @@ export function Alarm() {
       id: Date.now().toString(),
       hour,
       minute,
+      label: newLabel || '',
       enabled: true,
+      days: [...newDays],
     };
 
     const updated = [...alarms, newAlarm].sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
@@ -85,6 +97,8 @@ export function Alarm() {
 
     setNewHour('08');
     setNewMinute('00');
+    setNewLabel('');
+    setNewDays([]);
     setShowAddDialog(false);
   };
 
@@ -92,6 +106,12 @@ export function Alarm() {
     const updated = alarms.filter((a) => a.id !== id);
     setAlarms(updated);
     saveAlarms(updated);
+  };
+
+  const handleToggleDay = (day: number) => {
+    setNewDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+    );
   };
 
   return (
@@ -155,6 +175,35 @@ export function Alarm() {
                         {formatTime(alarm.hour, alarm.minute, is24Hour)}
                       </Typography>
                     }
+                    secondary={
+                      <Box sx={{ mt: 0.5 }}>
+                        {alarm.label && (
+                          <Typography variant="body2" color="text.secondary">
+                            {alarm.label}
+                          </Typography>
+                        )}
+                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                          {alarm.days.length === 0 ? (
+                            <Chip
+                              label="One-time"
+                              size="small"
+                              sx={{ fontSize: '0.7rem', height: 20, color: '#ff7300', borderColor: '#ff7300' }}
+                              variant="outlined"
+                            />
+                          ) : (
+                            alarm.days.sort().map((day) => (
+                              <Chip
+                                key={day}
+                                label={DAY_LABELS[day]}
+                                size="small"
+                                sx={{ fontSize: '0.7rem', height: 20, color: '#ff7300', borderColor: '#ff7300' }}
+                                variant="outlined"
+                              />
+                            ))
+                          )}
+                        </Box>
+                      </Box>
+                    }
                   />
                   <ListItemSecondaryAction>
                     <IconButton
@@ -212,6 +261,41 @@ export function Alarm() {
               placeholder="MM"
             />
           </Box>
+
+          {/* Label */}
+          <TextField
+            fullWidth
+            label="Label (optional)"
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+
+          {/* Day selector */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Repeat (leave empty for one-time alarm)
+          </Typography>
+          <FormGroup row>
+            {DAY_LABELS.map((label, index) => (
+              <FormControlLabel
+                key={label}
+                control={
+                  <Checkbox
+                    checked={newDays.includes(index)}
+                    onChange={() => handleToggleDay(index)}
+                    sx={{
+                      color: '#666',
+                      '&.Mui-checked': { color: '#ff7300' },
+                      padding: '4px',
+                    }}
+                    size="small"
+                  />
+                }
+                label={label}
+                sx={{ mr: 0.5 }}
+              />
+            ))}
+          </FormGroup>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowAddDialog(false)} sx={{ color: 'text.secondary' }}>
