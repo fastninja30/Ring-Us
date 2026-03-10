@@ -19,6 +19,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Switch,
 } from '@mui/material';
 import { IoMdAdd, IoMdTrash, IoMdAlarm } from 'react-icons/io';
 
@@ -108,6 +109,14 @@ export function Alarm() {
     saveAlarms(updated);
   };
 
+  const handleToggleAlarm = (id: string) => {
+    const updated = alarms.map((a) =>
+      a.id === id ? { ...a, enabled: !a.enabled } : a,
+    );
+    setAlarms(updated);
+    saveAlarms(updated);
+  };
+
   const handleToggleDay = (day: number) => {
     setNewDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
@@ -171,14 +180,23 @@ export function Alarm() {
                 <ListItem sx={{ py: 2 }}>
                   <ListItemText
                     primary={
-                      <Typography variant="h4" sx={{ fontWeight: 300 }}>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 300,
+                          color: alarm.enabled ? '#F4F3F2' : '#666',
+                        }}
+                      >
                         {formatTime(alarm.hour, alarm.minute, is24Hour)}
                       </Typography>
                     }
                     secondary={
                       <Box sx={{ mt: 0.5 }}>
                         {alarm.label && (
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography
+                            variant="body2"
+                            sx={{ color: alarm.enabled ? 'text.secondary' : '#555' }}
+                          >
                             {alarm.label}
                           </Typography>
                         )}
@@ -187,7 +205,12 @@ export function Alarm() {
                             <Chip
                               label="One-time"
                               size="small"
-                              sx={{ fontSize: '0.7rem', height: 20, color: '#ff7300', borderColor: '#ff7300' }}
+                              sx={{
+                                fontSize: '0.7rem',
+                                height: 20,
+                                color: alarm.enabled ? '#ff7300' : '#555',
+                                borderColor: alarm.enabled ? '#ff7300' : '#555',
+                              }}
                               variant="outlined"
                             />
                           ) : (
@@ -196,7 +219,12 @@ export function Alarm() {
                                 key={day}
                                 label={DAY_LABELS[day]}
                                 size="small"
-                                sx={{ fontSize: '0.7rem', height: 20, color: '#ff7300', borderColor: '#ff7300' }}
+                                sx={{
+                                  fontSize: '0.7rem',
+                                  height: 20,
+                                  color: alarm.enabled ? '#ff7300' : '#555',
+                                  borderColor: alarm.enabled ? '#ff7300' : '#555',
+                                }}
                                 variant="outlined"
                               />
                             ))
@@ -205,7 +233,17 @@ export function Alarm() {
                       </Box>
                     }
                   />
-                  <ListItemSecondaryAction>
+                  <ListItemSecondaryAction sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Switch
+                      checked={alarm.enabled}
+                      onChange={() => handleToggleAlarm(alarm.id)}
+                      sx={{
+                        '& .MuiSwitch-switchBase.Mui-checked': { color: '#ff7300' },
+                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                          backgroundColor: '#ff7300',
+                        },
+                      }}
+                    />
                     <IconButton
                       onClick={() => handleDeleteAlarm(alarm.id)}
                       sx={{ color: '#ff4444' }}
