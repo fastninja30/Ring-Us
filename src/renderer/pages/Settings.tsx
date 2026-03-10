@@ -71,13 +71,20 @@ export function Settings() {
 
     try {
       if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'invisible',
-        });
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          'recaptcha-container',
+          {
+            size: 'invisible',
+          },
+        );
       }
 
       const provider = new PhoneAuthProvider(auth);
-      const vId = await provider.verifyPhoneNumber(phoneNumber, window.recaptchaVerifier);
+      const vId = await provider.verifyPhoneNumber(
+        phoneNumber,
+        window.recaptchaVerifier,
+      );
       setVerificationId(vId);
       setPhoneStep('verify');
       setPhoneSuccess('Verification code sent to your phone!');
@@ -102,7 +109,10 @@ export function Settings() {
     setPhoneLoading(true);
 
     try {
-      const credential = PhoneAuthProvider.credential(verificationId, verificationCode);
+      const credential = PhoneAuthProvider.credential(
+        verificationId,
+        verificationCode,
+      );
       await linkWithCredential(user, credential);
       setPhoneSuccess('Phone number verified and linked to your account!');
       setPhoneStep('input');
@@ -113,7 +123,9 @@ export function Settings() {
       if (err.code === 'auth/invalid-verification-code') {
         setPhoneError('Invalid verification code.');
       } else if (err.code === 'auth/credential-already-in-use') {
-        setPhoneError('This phone number is already linked to another account.');
+        setPhoneError(
+          'This phone number is already linked to another account.',
+        );
       } else {
         setPhoneError(err.message || 'Failed to verify phone number.');
       }
@@ -144,7 +156,9 @@ export function Settings() {
 
       {/* Clock Settings */}
       <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>Clock</Typography>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Clock
+        </Typography>
         <FormControlLabel
           control={
             <Switch
@@ -165,15 +179,23 @@ export function Settings() {
       {/* Account Info */}
       {user && (
         <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>Account</Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Account
+          </Typography>
 
           <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" color="text.secondary">Name</Typography>
-            <Typography variant="body1">{user.displayName || 'Not set'}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Name
+            </Typography>
+            <Typography variant="body1">
+              {user.displayName || 'Not set'}
+            </Typography>
           </Box>
 
           <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" color="text.secondary">Email</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Email
+            </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="body1">{user.email}</Typography>
               {user.emailVerified ? (
@@ -197,7 +219,9 @@ export function Settings() {
               )}
             </Box>
             {emailMessage && (
-              <Alert severity="info" sx={{ mt: 1 }}>{emailMessage}</Alert>
+              <Alert severity="info" sx={{ mt: 1 }}>
+                {emailMessage}
+              </Alert>
             )}
           </Box>
 
@@ -216,7 +240,9 @@ export function Settings() {
                 />
               </Box>
             ) : (
-              <Typography variant="body1" color="text.secondary">Not linked</Typography>
+              <Typography variant="body1" color="text.secondary">
+                Not linked
+              </Typography>
             )}
           </Box>
 
@@ -249,15 +275,25 @@ export function Settings() {
       {user && !user.phoneNumber && (
         <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            <IoMdPhonePortrait style={{ verticalAlign: 'middle', marginRight: 8 }} />
+            <IoMdPhonePortrait
+              style={{ verticalAlign: 'middle', marginRight: 8 }}
+            />
             Phone Verification
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Link a phone number to your account for additional security.
           </Typography>
 
-          {phoneError && <Alert severity="error" sx={{ mb: 2 }}>{phoneError}</Alert>}
-          {phoneSuccess && <Alert severity="success" sx={{ mb: 2 }}>{phoneSuccess}</Alert>}
+          {phoneError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {phoneError}
+            </Alert>
+          )}
+          {phoneSuccess && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {phoneSuccess}
+            </Alert>
+          )}
 
           {phoneStep === 'input' ? (
             <>
@@ -286,7 +322,11 @@ export function Settings() {
                   '&:hover': { backgroundColor: '#e56700' },
                 }}
               >
-                {phoneLoading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Send Verification Code'}
+                {phoneLoading ? (
+                  <CircularProgress size={24} sx={{ color: '#fff' }} />
+                ) : (
+                  'Send Verification Code'
+                )}
               </Button>
             </>
           ) : (
@@ -309,7 +349,11 @@ export function Settings() {
                     '&:hover': { backgroundColor: '#e56700' },
                   }}
                 >
-                  {phoneLoading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Verify'}
+                  {phoneLoading ? (
+                    <CircularProgress size={24} sx={{ color: '#fff' }} />
+                  ) : (
+                    'Verify'
+                  )}
                 </Button>
                 <Button
                   variant="text"

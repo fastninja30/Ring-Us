@@ -30,7 +30,9 @@ export function VerifyEmail() {
       setMessage('Verification email sent! Check your inbox.');
     } catch (err: any) {
       if (err.code === 'auth/too-many-requests') {
-        setError('Too many requests. Please wait a few minutes before trying again.');
+        setError(
+          'Too many requests. Please wait a few minutes before trying again.',
+        );
       } else {
         setError(err.message || 'Failed to send verification email.');
       }
@@ -45,7 +47,9 @@ export function VerifyEmail() {
     if (user.emailVerified) {
       navigate('/home');
     } else {
-      setError('Email not yet verified. Please check your inbox and click the verification link.');
+      setError(
+        'Email not yet verified. Please check your inbox and click the verification link.',
+      );
     }
   };
 
@@ -61,7 +65,8 @@ export function VerifyEmail() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        background:
+          'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
       }}
     >
       <Paper
@@ -76,20 +81,33 @@ export function VerifyEmail() {
           textAlign: 'center',
         }}
       >
-        <IoMdMail style={{ fontSize: 64, color: '#ff7300', marginBottom: 16 }} />
+        <IoMdMail
+          style={{ fontSize: 64, color: '#ff7300', marginBottom: 16 }}
+        />
 
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#F4F3F2', mb: 1 }}>
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 800, color: '#F4F3F2', mb: 1 }}
+        >
           Verify Your Email
         </Typography>
 
         <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
           We sent a verification link to{' '}
-          <strong style={{ color: '#ff7300' }}>{user?.email}</strong>.
-          Please check your inbox and click the link to verify your account.
+          <strong style={{ color: '#ff7300' }}>{user?.email}</strong>
+          .Please check your inbox and click the link to verify your account.
         </Typography>
 
-        {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {message && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {message}
+          </Alert>
+        )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <Button
           fullWidth
@@ -104,7 +122,7 @@ export function VerifyEmail() {
             mb: 2,
           }}
         >
-          I've Verified My Email
+          I&apos;ve Verified My Email
         </Button>
 
         <Button
@@ -121,7 +139,11 @@ export function VerifyEmail() {
             mb: 2,
           }}
         >
-          {sending ? <CircularProgress size={24} sx={{ color: '#ff7300' }} /> : 'Resend Verification Email'}
+          {sending ? (
+            <CircularProgress size={24} sx={{ color: '#ff7300' }} />
+          ) : (
+            'Resend Verification Email'
+          )}
         </Button>
 
         <Button

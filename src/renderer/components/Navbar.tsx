@@ -2,7 +2,6 @@ import {
     AppBar,
     Badge,
     Drawer,
-    IconButton,
     List,
     ListItem,
     Toolbar,
@@ -27,10 +26,6 @@ export function Navbar() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const navigate = useNavigate();
-
-    const toggleDrawer = (open: boolean) => {
-        setDrawerOpen(open);
-    };
 
     const handleSignOut = async () => {
         await signOut(auth);
