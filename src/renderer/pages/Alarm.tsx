@@ -220,6 +220,25 @@ export function Alarm() {
     setFiringAlarm(null);
   };
 
+  const handleSnooze = () => {
+    if (!firingAlarm) return;
+    // Snooze for 5 minutes: create a one-time alarm 5 min from now
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 5);
+    const snoozeAlarm: AlarmData = {
+      id: Date.now().toString(),
+      hour: now.getHours(),
+      minute: now.getMinutes(),
+      label: `${firingAlarm.label || 'Alarm'} (Snoozed)`,
+      enabled: true,
+      days: [],
+    };
+    const updated = [...alarms, snoozeAlarm].sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
+    setAlarms(updated);
+    saveAlarms(updated);
+    setFiringAlarm(null);
+  };
+
   const handleToggleDay = (day: number) => {
     setNewDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
@@ -482,7 +501,20 @@ export function Alarm() {
             {firingAlarm?.label || 'Alarm'}
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>
+          <Button
+            onClick={handleSnooze}
+            variant="outlined"
+            size="large"
+            sx={{
+              borderColor: '#ff7300',
+              color: '#ff7300',
+              '&:hover': { borderColor: '#e56700', color: '#e56700' },
+              px: 4,
+            }}
+          >
+            Snooze (5 min)
+          </Button>
           <Button
             onClick={handleDismissAlarm}
             variant="contained"
