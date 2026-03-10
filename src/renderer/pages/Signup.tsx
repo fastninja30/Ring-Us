@@ -1,0 +1,247 @@
+import { useState, FormEvent } from 'react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from 'firebase/auth';
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Link,
+  IconButton,
+  InputAdornment,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
+import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock, IoMdPerson } from 'react-icons/io';
+import { auth } from '../firebaseConfig';
+
+export function Signup() {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const { user } = userCredential;
+
+      await updateProfile(user, { displayName: name });
+      await sendEmailVerification(user);
+
+      navigate('/verify-email');
+    } catch (err: any) {
+      switch (err.code) {
+        case 'auth/email-already-in-use':
+          setError('An account with this email already exists.');
+          break;
+        case 'auth/invalid-email':
+          setError('Invalid email address.');
+          break;
+        case 'auth/weak-password':
+          setError('Password is too weak. Use at least 6 characters.');
+          break;
+        default:
+          setError(err.message || 'Failed to create account.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+      }}
+    >
+      <Paper
+        elevation={8}
+        sx={{
+          p: 4,
+          width: '100%',
+          maxWidth: 420,
+          borderRadius: 3,
+          background: 'rgba(30, 30, 30, 0.9)',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              fontWeight: 800,
+              color: '#F4F3F2',
+              mb: 1,
+            }}
+          >
+            Create Account
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Join Ring-Us today
+          </Typography>
+        </Box>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+        <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Full Name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoComplete="name"
+            sx={{ mb: 2.5 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IoMdPerson style={{ color: '#9e9e9e' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Email Address"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            sx={{ mb: 2.5 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IoMdMail style={{ color: '#9e9e9e' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Password"
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+            helperText="Must be at least 6 characters"
+            sx={{ mb: 2.5 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IoMdLock style={{ color: '#9e9e9e' }} />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleTogglePassword}
+                    edge="end"
+                    aria-label={showPassword ? 'hide password' : 'show password'}
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    {showPassword ? <IoMdEyeOff /> : <IoMdEye />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Confirm Password"
+            type={showPassword ? 'text' : 'password'}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            autoComplete="new-password"
+            sx={{ mb: 2 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IoMdLock style={{ color: '#9e9e9e' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={loading}
+            sx={{
+              py: 1.5,
+              fontSize: '1rem',
+              fontWeight: 600,
+              backgroundColor: '#ff7300',
+              '&:hover': {
+                backgroundColor: '#e56700',
+              },
+              mb: 2,
+            }}
+          >
+            {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Sign Up'}
+          </Button>
+
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Already have an account?{' '}
+              <Link
+                component={RouterLink}
+                to="/"
+                underline="hover"
+                sx={{
+                  color: '#ff7300',
+                  fontWeight: 600,
+                  '&:hover': { color: '#e56700' },
+                }}
+              >
+                Sign In
+              </Link>
+            </Typography>
+          </Box>
+        </form>
+      </Paper>
+    </Box>
+  );
+}

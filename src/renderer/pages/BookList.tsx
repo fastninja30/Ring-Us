@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 interface Book {
@@ -12,9 +18,12 @@ export function BookList() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // New state variables for the input field and submission status
+  // State variables for the input field and submission status
   const [newTitle, setNewTitle] = useState('');
   const [isAdding, setIsAdding] = useState(false);
+
+  // State variable to track which book is currently being deleted
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // 1. Extract the fetch logic into a standalone function
   const fetchBooks = async () => {
@@ -23,9 +32,9 @@ export function BookList() {
       const booksCollection = collection(db, 'books');
       const bookSnapshot = await getDocs(booksCollection);
 
-      const bookList = bookSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
+      const bookList = bookSnapshot.docs.map((bookDoc) => ({
+        id: bookDoc.id,
+        ...bookDoc.data(),
       })) as Book[];
 
       setBooks(bookList);
@@ -43,23 +52,78 @@ export function BookList() {
 
   // 3. Create a function to handle adding data to Firestore
   const handleAddBook = async () => {
-    if (!newTitle.trim()) return; // Don't submit empty strings
+    if (!newTitle.trim()) return;
 
     setIsAdding(true);
     try {
       const booksCollection = collection(db, 'books');
 
-      // addDoc automatically generates a unique ID for the new document
-      await addDoc(booksCollection, {
-        title: newTitle.trim()
+      // Capture the document reference returned by addDoc
+      const docRef = await addDoc(booksCollection, {
+        title: newTitle.trim(),
       });
 
-      setNewTitle(''); // Clear the input field after success
+      // Create the new book object locally
+      const newBook: Book = {
+        id: docRef.id,
+        title: newTitle.trim(),
+      };
+
+      // Instantly update the local state so the UI reflects the addition
+      setBooks((prevBooks) => [...prevBooks, newBook]);
+
+      setNewTitle(''); // Clear the input field
     } catch (error) {
       console.error('Error adding book: ', error);
     } finally {
       setIsAdding(false);
     }
+  };
+
+  // 4. Create a function to handle deleting a specific document
+  const handleDeleteBook = async (id: string) => {
+    setDeletingId(id);
+    try {
+      const bookDocRef = doc(db, 'books', id);
+      await deleteDoc(bookDocRef);
+
+      // Instantly update local state so the UI reflects the deletion
+      setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
+    } catch (error) {
+      console.error('Error deleting book: ', error);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  // Helper function to handle conditional rendering
+  const renderBookList = () => {
+    if (loading && books.length === 0) {
+      return <p>Loading books...</p>;
+    }
+
+    if (books.length === 0) {
+      return <p>No books found in the database.</p>;
+    }
+
+    return (
+      <ul>
+        {books.map((book) => (
+          <li key={book.id} style={{ marginBottom: '8px' }}>
+            <strong>{book.title}</strong>
+            {book.author ? `by ${book.author}` : ''}
+            <button
+              type="button"
+              onClick={() => handleDeleteBook(book.id)}
+              disabled={deletingId === book.id}
+              style={{ marginLeft: '15px', color: 'red', cursor: 'pointer' }}
+            >
+              {deletingId === book.id ? 'Deleting...' : 'Delete'}
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   return (
@@ -82,29 +146,28 @@ export function BookList() {
           disabled={isAdding}
           style={{ marginRight: '10px', padding: '5px' }}
         />
-        <button onClick={handleAddBook} disabled={isAdding || !newTitle.trim()}>
+        {/* Add Book Button */}
+        <button
+          type="button"
+          onClick={handleAddBook}
+          disabled={isAdding || !newTitle.trim()}
+        >
           {isAdding ? 'Adding...' : 'Add Book'}
         </button>
 
-        <button onClick={fetchBooks} disabled={loading} style={{ marginLeft: '10px' }}>
+        {/* Reload List Button */}
+        <button
+          type="button"
+          onClick={fetchBooks}
+          disabled={loading}
+          style={{ marginLeft: '10px' }}
+        >
           {loading ? 'Loading...' : 'Reload List'}
         </button>
       </div>
 
       {/* Display the Data */}
-      {loading && books.length === 0 ? (
-        <p>Loading books...</p>
-      ) : books.length === 0 ? (
-        <p>No books found in the database.</p>
-      ) : (
-        <ul>
-          {books.map((book) => (
-            <li key={book.id}>
-              <strong>{book.title}</strong> {book.author ? `by ${book.author}` : ''}
-            </li>
-          ))}
-        </ul>
-      )}
+      {renderBookList()}
     </div>
   );
-  }
+}

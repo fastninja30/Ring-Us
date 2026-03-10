@@ -9,16 +9,28 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { FaHome } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
+import { IoMdAlarm, IoMdLogOut } from "react-icons/io";
+import { auth } from "../firebaseConfig";
 import { GrCircleQuestion } from "react-icons/gr";
 
 
 const drawerWidth = 240;
 
 export function Navbar() {
+    const navigate = useNavigate();
+
+    const handleSignOut = async () => {
+        await signOut(auth);
+        navigate('/');
+    };
+    
     return (
         <Drawer
             variant="permanent"
@@ -64,6 +76,7 @@ export function Navbar() {
                             <ListItemText primary="Settings" />
                         </ListItemButton>
                     </ListItem>
+                    
                 </List>
             </Box>
         </Drawer>
