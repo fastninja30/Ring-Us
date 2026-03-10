@@ -1,15 +1,14 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
-import { IoMdClock } from "react-icons/io";
-import icon from '../../assets/icon.svg';
 import './App.css';
 import { Navbar } from './components/Navbar';
 import { BookList } from './pages/BookList';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Clock } from './pages/Clock';
+import { Alarm } from './pages/Alarm';
 import { Settings } from './pages/Settings';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
@@ -43,6 +42,22 @@ export default function App() {
               </div>
             </>
           }/>
+          <Route path="/alarm" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <Alarm />
+              </div>
+            </>
+          }/>
+          <Route path="/clock" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <Clock />
+              </div>
+            </>
+          }/>
           <Route path="/book-list" element={
             <>
               <Navbar />
@@ -56,6 +71,14 @@ export default function App() {
               <Navbar />
               <div className="main-content">
                 <About />
+              </div>
+            </>
+          }/>
+          <Route path="/settings" element={
+            <>
+              <Navbar />
+              <div className="main-content">
+                <Settings />
               </div>
             </>
           }/>

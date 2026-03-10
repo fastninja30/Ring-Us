@@ -15,6 +15,7 @@ import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { FaHome } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
+import { IoMdAlarm } from "react-icons/io";
 
 export function Navbar() {
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -30,6 +31,11 @@ export function Navbar() {
             <NavLink to="/home" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <IconButton>
                     <Typography><FaHome /></Typography>
+                </IconButton>
+            </NavLink>
+            <NavLink to="/alarm" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <IconButton>
+                    <Typography><IoMdAlarm /></Typography>
                 </IconButton>
             </NavLink>
             <NavLink to="/book-list" style={{ textDecoration: 'none', color: 'inherit' }}>
