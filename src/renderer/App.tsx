@@ -4,6 +4,7 @@ import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
 import './App.css';
 import { AuthProvider } from './contexts/AuthContext';
+import { FriendsProvider } from './contexts/FriendsContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Navbar } from './components/Navbar';
 import { BookList } from './pages/BookList';
@@ -12,6 +13,7 @@ import { About } from './pages/About';
 import { Clock } from './pages/Clock';
 import { Alarm } from './pages/Alarm';
 import { Settings } from './pages/Settings';
+import { Friends } from './pages/Friends';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { VerifyEmail } from './pages/VerifyEmail';
@@ -44,6 +46,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
+        <FriendsProvider>
         <Router>
           <CssBaseline />
           <Routes>
@@ -71,8 +74,12 @@ export default function App() {
             <Route path="/settings" element={
               <ProtectedLayout><Settings /></ProtectedLayout>
             } />
+            <Route path="/friends" element={
+              <ProtectedLayout><Friends /></ProtectedLayout>
+            } />
           </Routes>
         </Router>
+        </FriendsProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -1,13 +1,14 @@
-import { 
-    AppBar, 
+import {
+    AppBar,
+    Badge,
     Drawer,
     IconButton,
     List,
     ListItem,
-    Toolbar, 
-    Typography, 
-    useMediaQuery, 
-    useTheme 
+    Toolbar,
+    Typography,
+    useMediaQuery,
+    useTheme
 } from "@mui/material";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -16,11 +17,13 @@ import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { FaHome } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
-import { IoMdAlarm, IoMdLogOut } from "react-icons/io";
+import { IoMdAlarm, IoMdLogOut, IoMdPeople } from "react-icons/io";
 import { auth } from "../firebaseConfig";
+import { useFriends } from "../contexts/FriendsContext";
 
 export function Navbar() {
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const { pendingRequestCount } = useFriends();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const navigate = useNavigate();
@@ -44,6 +47,13 @@ export function Navbar() {
             <NavLink to="/alarm" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <IconButton>
                     <Typography><IoMdAlarm /></Typography>
+                </IconButton>
+            </NavLink>
+            <NavLink to="/friends" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <IconButton>
+                    <Badge badgeContent={pendingRequestCount} color="error">
+                        <Typography><IoMdPeople /></Typography>
+                    </Badge>
                 </IconButton>
             </NavLink>
             <NavLink to="/book-list" style={{ textDecoration: 'none', color: 'inherit' }}>
