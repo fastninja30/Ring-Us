@@ -1,5 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material'; 
+import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material'; 
 import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
 import { IoMdClock } from "react-icons/io";
@@ -30,8 +30,9 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <Router> 
         <CssBaseline />
-        <Navbar />
-        <div className="main-content">
+        <Box sx={{ display: 'flex' }}>
+          <Navbar />
+          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <Routes>
             <Route path="/" element={<Home />}/>
             <Route path="/book-list" element={<BookList />}/>
@@ -39,7 +40,8 @@ export default function App() {
             <Route path="/clock" element={<Clock />}/>
             <Route path="/settings" element={<Settings />}/>
           </Routes>
-        </div>
+          </Box>
+        </Box>
       </Router>
     </ThemeProvider>
   );
