@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import {
   Box,
   Button,
@@ -9,19 +10,72 @@ import {
   Link,
   IconButton,
   InputAdornment,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock } from 'react-icons/io';
+import { auth } from '../firebaseConfig';
 
 export function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Mock login - navigate to home page
-    navigate('/home');
+    setError('');
+    setLoading(true);
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const { user } = userCredential;
+
+      if (!user.emailVerified) {
+        navigate('/verify-email');
+      } else {
+        navigate('/home');
+      }
+    } catch (err: any) {
+      switch (err.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          setError('Invalid email or password.');
+          break;
+        case 'auth/too-many-requests':
+          setError('Too many failed attempts. Please try again later.');
+          break;
+        case 'auth/invalid-email':
+          setError('Invalid email address.');
+          break;
+        default:
+          setError(err.message || 'Failed to sign in.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Please enter your email address first.');
+      return;
+    }
+    setError('');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetSent(true);
+    } catch (err: any) {
+      if (err.code === 'auth/user-not-found') {
+        setError('No account found with this email.');
+      } else {
+        setError(err.message || 'Failed to send reset email.');
+      }
+    }
   };
 
   const handleTogglePassword = () => {
@@ -65,6 +119,13 @@ export function Login() {
             Sign in to continue to Ring-Us
           </Typography>
         </Box>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {resetSent && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            Password reset email sent! Check your inbox.
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -117,7 +178,9 @@ export function Login() {
 
           <Box sx={{ textAlign: 'right', mb: 3 }}>
             <Link
-              href="#"
+              component="button"
+              type="button"
+              onClick={handleForgotPassword}
               underline="hover"
               sx={{
                 color: 'text.secondary',
@@ -134,6 +197,7 @@ export function Login() {
             fullWidth
             variant="contained"
             size="large"
+            disabled={loading}
             sx={{
               py: 1.5,
               fontSize: '1rem',
@@ -145,7 +209,7 @@ export function Login() {
               mb: 2,
             }}
           >
-            Sign In
+            {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Sign In'}
           </Button>
 
           <Box sx={{ textAlign: 'center' }}>

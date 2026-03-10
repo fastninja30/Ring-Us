@@ -10,19 +10,28 @@ import {
     useTheme 
 } from "@mui/material";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { FaHome } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa";
 import { FaGear } from "react-icons/fa6";
+import { IoMdAlarm, IoMdLogOut } from "react-icons/io";
+import { auth } from "../firebaseConfig";
 
 export function Navbar() {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    
+    const navigate = useNavigate();
+
     const toggleDrawer = (open: boolean) => {
         setDrawerOpen(open);
+    };
+
+    const handleSignOut = async () => {
+        await signOut(auth);
+        navigate('/');
     };
 
     const menuItems = (
@@ -30,6 +39,11 @@ export function Navbar() {
             <NavLink to="/home" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <IconButton>
                     <Typography><FaHome /></Typography>
+                </IconButton>
+            </NavLink>
+            <NavLink to="/alarm" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <IconButton>
+                    <Typography><IoMdAlarm /></Typography>
                 </IconButton>
             </NavLink>
             <NavLink to="/book-list" style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -52,6 +66,9 @@ export function Navbar() {
                     <Typography><FaGear /></Typography>
                 </IconButton>
             </NavLink>
+            <IconButton onClick={handleSignOut} sx={{ color: 'inherit' }}>
+                <Typography><IoMdLogOut /></Typography>
+            </IconButton>
         </>
     );
 

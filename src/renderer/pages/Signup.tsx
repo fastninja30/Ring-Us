@@ -1,6 +1,11 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from 'firebase/auth';
+import {
   Box,
   Button,
   TextField,
@@ -9,8 +14,11 @@ import {
   Link,
   IconButton,
   InputAdornment,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock, IoMdPerson } from 'react-icons/io';
+import { auth } from '../firebaseConfig';
 
 export function Signup() {
   const navigate = useNavigate();
@@ -19,11 +27,50 @@ export function Signup() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Mock signup - navigate to home page
-    navigate('/home');
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const { user } = userCredential;
+
+      await updateProfile(user, { displayName: name });
+      await sendEmailVerification(user);
+
+      navigate('/verify-email');
+    } catch (err: any) {
+      switch (err.code) {
+        case 'auth/email-already-in-use':
+          setError('An account with this email already exists.');
+          break;
+        case 'auth/invalid-email':
+          setError('Invalid email address.');
+          break;
+        case 'auth/weak-password':
+          setError('Password is too weak. Use at least 6 characters.');
+          break;
+        default:
+          setError(err.message || 'Failed to create account.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTogglePassword = () => {
@@ -67,6 +114,8 @@ export function Signup() {
             Join Ring-Us today
           </Typography>
         </Box>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -113,6 +162,7 @@ export function Signup() {
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="new-password"
+            helperText="Must be at least 6 characters"
             sx={{ mb: 2.5 }}
             InputProps={{
               startAdornment: (
@@ -158,6 +208,7 @@ export function Signup() {
             fullWidth
             variant="contained"
             size="large"
+            disabled={loading}
             sx={{
               py: 1.5,
               fontSize: '1rem',
@@ -169,7 +220,7 @@ export function Signup() {
               mb: 2,
             }}
           >
-            Sign Up
+            {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Sign Up'}
           </Button>
 
           <Box sx={{ textAlign: 'center' }}>
