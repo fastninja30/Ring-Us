@@ -76,6 +76,12 @@ export function Navbar() {
                             <ListItemText primary="Settings" />
                         </ListItemButton>
                     </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={handleSignOut} sx={{ color: 'inherit' }}>
+                            <ListItemIcon sx={{ color: 'inherit' }}><IoMdLogOut /></ListItemIcon>
+                            <ListItemText primary="Logout" />
+                        </ListItemButton>
+                    </ListItem>
                     
                 </List>
             </Box>
