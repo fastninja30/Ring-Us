@@ -11,8 +11,9 @@ import {
   InputAdornment,
   CircularProgress,
   Chip,
+  IconButton,
 } from '@mui/material';
-import { IoMdPhonePortrait, IoMdCheckmarkCircle } from 'react-icons/io';
+import { IoMdPhonePortrait, IoMdCheckmarkCircle, IoMdCopy } from 'react-icons/io';
 import {
   PhoneAuthProvider,
   linkWithCredential,
@@ -21,6 +22,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import { useAuth } from '../contexts/AuthContext';
+import { useFriends } from '../contexts/FriendsContext';
 
 declare global {
   interface Window {
@@ -30,6 +32,7 @@ declare global {
 
 export function Settings() {
   const { user } = useAuth();
+  const { userProfile } = useFriends();
   const [is24Hour, setIs24Hour] = useState(false);
 
   // Phone verification
@@ -222,10 +225,8 @@ export function Settings() {
             )}
           </Box>
 
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              Phone
-            </Typography>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary">Phone</Typography>
             {user.phoneNumber ? (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="body1">{user.phoneNumber}</Typography>
@@ -243,6 +244,29 @@ export function Settings() {
                 Not linked
               </Typography>
             )}
+          </Box>
+
+          <Box>
+            <Typography variant="body2" color="text.secondary">Friend Code</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="body1"
+                sx={{ fontFamily: 'monospace', letterSpacing: 2, color: '#ff7300' }}
+              >
+                {userProfile?.friendCode || '------'}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  if (userProfile?.friendCode) {
+                    navigator.clipboard.writeText(userProfile.friendCode);
+                  }
+                }}
+                sx={{ color: '#ff7300' }}
+              >
+                <IoMdCopy />
+              </IconButton>
+            </Box>
           </Box>
         </Paper>
       )}

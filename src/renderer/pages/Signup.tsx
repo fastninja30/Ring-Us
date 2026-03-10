@@ -17,14 +17,9 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import {
-  IoMdEye,
-  IoMdEyeOff,
-  IoMdMail,
-  IoMdLock,
-  IoMdPerson,
-} from 'react-icons/io';
-import { auth } from '../firebaseConfig';
+import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock, IoMdPerson } from 'react-icons/io';
+import { auth, db } from '../firebaseConfig';
+import { doc, setDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 
 export function Signup() {
   const navigate = useNavigate();
@@ -62,6 +57,30 @@ export function Signup() {
 
       await updateProfile(user, { displayName: name });
       await sendEmailVerification(user);
+
+      // Create Firestore user profile with friend code
+      const friendCodeChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let friendCode = '';
+      for (let i = 0; i < 6; i++) {
+        friendCode += friendCodeChars.charAt(Math.floor(Math.random() * friendCodeChars.length));
+      }
+      // Check uniqueness and retry if needed
+      const codeQuery = query(collection(db, 'users'), where('friendCode', '==', friendCode));
+      const codeSnap = await getDocs(codeQuery);
+      if (!codeSnap.empty) {
+        friendCode = '';
+        for (let i = 0; i < 6; i++) {
+          friendCode += friendCodeChars.charAt(Math.floor(Math.random() * friendCodeChars.length));
+        }
+      }
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
+        displayName: name,
+        email,
+        friendCode,
+        friends: [],
+        createdAt: serverTimestamp(),
+      });
 
       navigate('/verify-email');
     } catch (err: any) {

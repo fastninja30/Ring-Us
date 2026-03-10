@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -21,21 +21,11 @@ import {
   Checkbox,
   Switch,
 } from '@mui/material';
-import {
-  IoMdAdd,
-  IoMdTrash,
-  IoMdAlarm,
-  IoMdNotifications,
-} from 'react-icons/io';
-
-interface AlarmData {
-  id: string;
-  hour: number;
-  minute: number;
-  label: string;
-  enabled: boolean;
-  days: number[]; // 0=Sun, 1=Mon, ... 6=Sat. Empty = one-time
-}
+import { IoMdAdd, IoMdTrash, IoMdAlarm, IoMdNotifications, IoMdPeople } from 'react-icons/io';
+import { AlarmData } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { useFriends } from '../contexts/FriendsContext';
+import { useSharedAlarms } from '../hooks/useSharedAlarms';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -94,19 +84,56 @@ function playAlarmSound(
   }
 }
 
+// Union type for rendering both alarm types in a single list
+interface DisplayAlarm {
+  id: string;
+  hour: number;
+  minute: number;
+  label: string;
+  enabled: boolean;
+  days: number[];
+  isShared: boolean;
+  ownerId?: string;
+  ownerName?: string;
+  participantNames?: string[];
+}
+
 export function Alarm() {
+  const { user } = useAuth();
+  const { friends } = useFriends();
+  const { sharedAlarms, createSharedAlarm, toggleSharedAlarm, deleteSharedAlarm, leaveSharedAlarm } = useSharedAlarms();
+
   const [alarms, setAlarms] = useState<AlarmData[]>(loadAlarms);
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [firingAlarm, setFiringAlarm] = useState<AlarmData | null>(null);
+  const [firingAlarm, setFiringAlarm] = useState<DisplayAlarm | null>(null);
   const [newHour, setNewHour] = useState('08');
   const [newMinute, setNewMinute] = useState('00');
   const [newLabel, setNewLabel] = useState('');
   const [newDays, setNewDays] = useState<number[]>([]);
+  const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const firedAlarmsRef = useRef<Set<string>>(new Set());
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const is24Hour = localStorage.getItem('settings-is24Hour') === 'true';
+
+  // Merge local and shared alarms into a single sorted list
+  const allAlarms: DisplayAlarm[] = useMemo(() => {
+    const local: DisplayAlarm[] = alarms.map((a) => ({ ...a, isShared: false }));
+    const shared: DisplayAlarm[] = sharedAlarms.map((a) => ({
+      id: a.id,
+      hour: a.hour,
+      minute: a.minute,
+      label: a.label,
+      enabled: a.enabled,
+      days: a.days,
+      isShared: true,
+      ownerId: a.ownerId,
+      ownerName: a.ownerName,
+      participantNames: a.participantNames,
+    }));
+    return [...local, ...shared].sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
+  }, [alarms, sharedAlarms]);
 
   // Update current time every second
   useEffect(() => {
@@ -116,7 +143,7 @@ export function Alarm() {
     return () => clearInterval(timer);
   }, []);
 
-  // Check alarms every second
+  // Check alarms every second (both local and shared)
   const checkAlarms = useCallback(() => {
     const now = currentTime;
     const currentHour = now.getHours();
@@ -124,7 +151,7 @@ export function Alarm() {
     const currentDay = now.getDay();
     const timeKey = `${currentHour}:${currentMinute}`;
 
-    alarms.forEach((alarm) => {
+    allAlarms.forEach((alarm) => {
       if (!alarm.enabled) return;
 
       const alarmFiredKey = `${alarm.id}-${timeKey}`;
@@ -142,14 +169,17 @@ export function Alarm() {
 
         // Send native notification
         if (Notification.permission === 'granted') {
+          const body = alarm.isShared
+            ? `Shared alarm - ${alarm.label || formatTime(alarm.hour, alarm.minute, is24Hour)}`
+            : alarm.label || `Alarm - ${formatTime(alarm.hour, alarm.minute, is24Hour)}`;
           new Notification('Ring-Us Alarm', {
-            body: alarm.label || `Alarm - ${formatTime(alarm.hour, alarm.minute, is24Hour)}`,
+            body,
             requireInteraction: true,
           });
         }
 
-        // Disable one-time alarms after firing
-        if (alarm.days.length === 0) {
+        // Disable one-time local alarms after firing
+        if (!alarm.isShared && alarm.days.length === 0) {
           setAlarms((prev) => {
             const updated = prev.map((a) =>
               a.id === alarm.id ? { ...a, enabled: false } : a,
@@ -160,7 +190,7 @@ export function Alarm() {
         }
       }
     });
-  }, [currentTime, alarms, is24Hour]);
+  }, [currentTime, allAlarms, is24Hour]);
 
   useEffect(() => {
     checkAlarms();
@@ -181,7 +211,7 @@ export function Alarm() {
     }
   }, []);
 
-  const handleAddAlarm = () => {
+  const handleAddAlarm = async () => {
     const hour = parseInt(newHour, 10);
     const minute = parseInt(newMinute, 10);
 
@@ -189,38 +219,64 @@ export function Alarm() {
       return;
     }
 
-    const newAlarm: AlarmData = {
-      id: Date.now().toString(),
-      hour,
-      minute,
-      label: newLabel || '',
-      enabled: true,
-      days: [...newDays],
-    };
+    if (selectedFriends.length > 0) {
+      // Create shared alarm in Firestore
+      const friendNames = selectedFriends.map(
+        (uid) => friends.find((f) => f.uid === uid)?.displayName || '',
+      );
+      await createSharedAlarm(
+        { hour, minute, label: newLabel || '', days: [...newDays] },
+        selectedFriends,
+        friendNames,
+      );
+    } else {
+      // Create local alarm
+      const newAlarm: AlarmData = {
+        id: Date.now().toString(),
+        hour,
+        minute,
+        label: newLabel || '',
+        enabled: true,
+        days: [...newDays],
+      };
 
-    const updated = [...alarms, newAlarm].sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
-    setAlarms(updated);
-    saveAlarms(updated);
+      const updated = [...alarms, newAlarm].sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
+      setAlarms(updated);
+      saveAlarms(updated);
+    }
 
     setNewHour('08');
     setNewMinute('00');
     setNewLabel('');
     setNewDays([]);
+    setSelectedFriends([]);
     setShowAddDialog(false);
   };
 
-  const handleDeleteAlarm = (id: string) => {
-    const updated = alarms.filter((a) => a.id !== id);
-    setAlarms(updated);
-    saveAlarms(updated);
+  const handleDeleteAlarm = (alarm: DisplayAlarm) => {
+    if (alarm.isShared) {
+      if (alarm.ownerId === user?.uid) {
+        deleteSharedAlarm(alarm.id);
+      } else {
+        leaveSharedAlarm(alarm.id);
+      }
+    } else {
+      const updated = alarms.filter((a) => a.id !== alarm.id);
+      setAlarms(updated);
+      saveAlarms(updated);
+    }
   };
 
-  const handleToggleAlarm = (id: string) => {
-    const updated = alarms.map((a) =>
-      a.id === id ? { ...a, enabled: !a.enabled } : a,
-    );
-    setAlarms(updated);
-    saveAlarms(updated);
+  const handleToggleAlarm = (alarm: DisplayAlarm) => {
+    if (alarm.isShared) {
+      toggleSharedAlarm(alarm.id, !alarm.enabled);
+    } else {
+      const updated = alarms.map((a) =>
+        a.id === alarm.id ? { ...a, enabled: !a.enabled } : a,
+      );
+      setAlarms(updated);
+      saveAlarms(updated);
+    }
   };
 
   const handleDismissAlarm = () => {
@@ -229,7 +285,7 @@ export function Alarm() {
 
   const handleSnooze = () => {
     if (!firingAlarm) return;
-    // Snooze for 5 minutes: create a one-time alarm 5 min from now
+    // Snooze for 5 minutes: create a one-time local alarm 5 min from now
     const now = new Date();
     now.setMinutes(now.getMinutes() + 5);
     const snoozeAlarm: AlarmData = {
@@ -250,6 +306,24 @@ export function Alarm() {
     setNewDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
     );
+  };
+
+  const handleToggleFriend = (uid: string) => {
+    setSelectedFriends((prev) =>
+      prev.includes(uid) ? prev.filter((id) => id !== uid) : [...prev, uid],
+    );
+  };
+
+  // Get other participants' names for display (excluding current user)
+  const getOtherParticipants = (alarm: DisplayAlarm): string => {
+    if (!alarm.participantNames) return '';
+    const others = alarm.participantNames.filter(
+      (_, i) => {
+        const sharedAlarm = sharedAlarms.find((sa) => sa.id === alarm.id);
+        return sharedAlarm && sharedAlarm.participants[i] !== user?.uid;
+      }
+    );
+    return others.join(', ');
   };
 
   return (
@@ -293,7 +367,7 @@ export function Alarm() {
       </Box>
 
       {/* Alarm list */}
-      {alarms.length === 0 ? (
+      {allAlarms.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center', background: 'rgba(30, 30, 30, 0.7)' }}>
           <IoMdAlarm style={{ fontSize: 48, color: '#666', marginBottom: 8 }} />
           <Typography color="text.secondary">
@@ -303,8 +377,8 @@ export function Alarm() {
       ) : (
         <Paper sx={{ background: 'rgba(30, 30, 30, 0.7)' }}>
           <List>
-            {alarms.map((alarm, index) => (
-              <Box key={alarm.id}>
+            {allAlarms.map((alarm, index) => (
+              <Box key={`${alarm.isShared ? 'shared' : 'local'}-${alarm.id}`}>
                 {index > 0 && <Divider />}
                 <ListItem sx={{ py: 2 }}>
                   <ListItemText
@@ -329,7 +403,31 @@ export function Alarm() {
                             {alarm.label}
                           </Typography>
                         )}
-                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                        {alarm.isShared && (
+                          <Typography
+                            variant="body2"
+                            sx={{ color: alarm.enabled ? '#ff7300' : '#555', fontSize: '0.75rem' }}
+                          >
+                            {alarm.ownerId === user?.uid
+                              ? `with ${getOtherParticipants(alarm)}`
+                              : `by ${alarm.ownerName}`}
+                          </Typography>
+                        )}
+                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
+                          {alarm.isShared && (
+                            <Chip
+                              icon={<IoMdPeople style={{ fontSize: 14 }} />}
+                              label="Shared"
+                              size="small"
+                              sx={{
+                                fontSize: '0.7rem',
+                                height: 20,
+                                color: alarm.enabled ? '#ff7300' : '#555',
+                                borderColor: alarm.enabled ? '#ff7300' : '#555',
+                              }}
+                              variant="outlined"
+                            />
+                          )}
                           {alarm.days.length === 0 ? (
                             <Chip
                               label="One-time"
@@ -365,7 +463,7 @@ export function Alarm() {
                   <ListItemSecondaryAction sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Switch
                       checked={alarm.enabled}
-                      onChange={() => handleToggleAlarm(alarm.id)}
+                      onChange={() => handleToggleAlarm(alarm)}
                       sx={{
                         '& .MuiSwitch-switchBase.Mui-checked': { color: '#ff7300' },
                         '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
@@ -374,7 +472,7 @@ export function Alarm() {
                       }}
                     />
                     <IconButton
-                      onClick={() => handleDeleteAlarm(alarm.id)}
+                      onClick={() => handleDeleteAlarm(alarm)}
                       sx={{ color: '#ff4444' }}
                     >
                       <IoMdTrash />
@@ -463,6 +561,40 @@ export function Alarm() {
               />
             ))}
           </FormGroup>
+
+          {/* Share with Friends */}
+          {friends.length > 0 && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Share with Friends (optional)
+              </Typography>
+              <FormGroup>
+                {friends.map((friend) => (
+                  <FormControlLabel
+                    key={friend.uid}
+                    control={
+                      <Checkbox
+                        checked={selectedFriends.includes(friend.uid)}
+                        onChange={() => handleToggleFriend(friend.uid)}
+                        sx={{
+                          color: '#666',
+                          '&.Mui-checked': { color: '#ff7300' },
+                          padding: '4px',
+                        }}
+                        size="small"
+                      />
+                    }
+                    label={friend.displayName}
+                  />
+                ))}
+              </FormGroup>
+              {selectedFriends.length > 0 && (
+                <Typography variant="caption" sx={{ color: '#ff7300', mt: 0.5, display: 'block' }}>
+                  This alarm will sync with selected friends.
+                </Typography>
+              )}
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowAddDialog(false)} sx={{ color: 'text.secondary' }}>
@@ -507,6 +639,19 @@ export function Alarm() {
           <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
             {firingAlarm?.label || 'Alarm'}
           </Typography>
+          {firingAlarm?.isShared && (
+            <Chip
+              icon={<IoMdPeople style={{ fontSize: 14 }} />}
+              label="Shared alarm"
+              size="small"
+              sx={{
+                mt: 1,
+                color: '#ff7300',
+                borderColor: '#ff7300',
+              }}
+              variant="outlined"
+            />
+          )}
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>
           <Button
