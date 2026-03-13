@@ -246,10 +246,10 @@ export function Alarm() {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
+    <Box sx={{ maxWidth: 600, mx: 'auto', mt: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 } }}>
       {/* Current time display */}
-      <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <Typography variant="h2" sx={{ fontWeight: 300 }}>
+      <Box sx={{ textAlign: 'center', mb: { xs: 2, sm: 4 } }}>
+        <Typography variant="h2" sx={{ fontWeight: 300, fontSize: { xs: '2.5rem', sm: '3rem' } }}>
           {currentTime.toLocaleTimeString('en-US', {
             hour12: !is24Hour,
             hour: '2-digit',
@@ -268,7 +268,7 @@ export function Alarm() {
       </Box>
 
       {/* Header with add button */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 1, sm: 0 } }}>
         <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <IoMdAlarm /> Alarms
         </Typography>
@@ -279,6 +279,7 @@ export function Alarm() {
           sx={{
             backgroundColor: '#ff7300',
             '&:hover': { backgroundColor: '#e56700' },
+            width: { xs: '100%', sm: 'auto' },
           }}
         >
           Add Alarm
@@ -287,7 +288,7 @@ export function Alarm() {
 
       {/* Alarm list */}
       {alarms.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center', background: 'rgba(30, 30, 30, 0.7)' }}>
+        <Paper sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', background: 'rgba(30, 30, 30, 0.7)' }}>
           <IoMdAlarm style={{ fontSize: 48, color: '#666', marginBottom: 8 }} />
           <Typography color="text.secondary">
             No alarms set. Tap "Add Alarm" to create one.
@@ -299,7 +300,7 @@ export function Alarm() {
             {alarms.map((alarm, index) => (
               <Box key={alarm.id}>
                 {index > 0 && <Divider />}
-                <ListItem sx={{ py: 2 }}>
+                <ListItem sx={{ py: 2, flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' } }}>
                   <ListItemText
                     primary={
                       <Typography
@@ -307,6 +308,7 @@ export function Alarm() {
                         sx={{
                           fontWeight: 300,
                           color: alarm.enabled ? '#F4F3F2' : '#666',
+                          fontSize: { xs: '1.5rem', sm: '2rem' },
                         }}
                       >
                         {formatTime(alarm.hour, alarm.minute, is24Hour)}
@@ -322,7 +324,7 @@ export function Alarm() {
                             {alarm.label}
                           </Typography>
                         )}
-                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
                           {alarm.days.length === 0 ? (
                             <Chip
                               label="One-time"
@@ -355,7 +357,7 @@ export function Alarm() {
                       </Box>
                     }
                   />
-                  <ListItemSecondaryAction sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ListItemSecondaryAction sx={{ display: 'flex', alignItems: 'center', gap: 1, position: { xs: 'relative', sm: 'absolute' }, right: { xs: 0, sm: 'unset' }, top: { xs: 'unset', sm: 'unset' }, mt: { xs: 1, sm: 0 } }}>
                     <Switch
                       checked={alarm.enabled}
                       onChange={() => handleToggleAlarm(alarm.id)}
@@ -385,12 +387,12 @@ export function Alarm() {
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
         PaperProps={{
-          sx: { background: 'rgba(30, 30, 30, 0.95)', minWidth: 350 },
+          sx: { background: 'rgba(30, 30, 30, 0.95)', minWidth: { xs: '90%', sm: 350 } },
         }}
       >
         <DialogTitle>Set New Alarm</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, my: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, my: 2, flexWrap: 'wrap' }}>
             <TextField
               value={newHour}
               onChange={(e) => {
@@ -398,7 +400,7 @@ export function Alarm() {
                 setNewHour(val);
               }}
               inputProps={{
-                style: { textAlign: 'center', fontSize: '2rem', width: 60 },
+                style: { textAlign: 'center', fontSize: '2rem', width: '50px' },
                 maxLength: 2,
               }}
               variant="outlined"
@@ -413,7 +415,7 @@ export function Alarm() {
                 setNewMinute(val);
               }}
               inputProps={{
-                style: { textAlign: 'center', fontSize: '2rem', width: 60 },
+                style: { textAlign: 'center', fontSize: '2rem', width: '50px' },
                 maxLength: 2,
               }}
               variant="outlined"
@@ -457,8 +459,8 @@ export function Alarm() {
             ))}
           </FormGroup>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowAddDialog(false)} sx={{ color: 'text.secondary' }}>
+        <DialogActions sx={{ flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 1, sm: 0 }, width: { xs: '100%', sm: 'auto' } }}>
+          <Button onClick={() => setShowAddDialog(false)} sx={{ color: 'text.secondary', width: { xs: '100%', sm: 'auto' } }}>
             Cancel
           </Button>
           <Button
@@ -467,6 +469,7 @@ export function Alarm() {
             sx={{
               backgroundColor: '#ff7300',
               '&:hover': { backgroundColor: '#e56700' },
+              width: { xs: '100%', sm: 'auto' },
             }}
           >
             Save
@@ -481,15 +484,16 @@ export function Alarm() {
         PaperProps={{
           sx: {
             background: 'rgba(30, 30, 30, 0.95)',
-            minWidth: 350,
+            minWidth: { xs: '90%', sm: 350 },
             textAlign: 'center',
           },
         }}
       >
         <DialogContent sx={{ pt: 4 }}>
-          <IoMdNotifications
-            style={{
-              fontSize: 64,
+          <Box
+            component={IoMdNotifications}
+            sx={{
+              fontSize: { xs: 48, sm: 64 },
               color: '#ff7300',
               animation: 'shake 0.5s ease-in-out infinite',
             }}
@@ -501,7 +505,7 @@ export function Alarm() {
             {firingAlarm?.label || 'Alarm'}
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2, flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
           <Button
             onClick={handleSnooze}
             variant="outlined"
@@ -511,6 +515,7 @@ export function Alarm() {
               color: '#ff7300',
               '&:hover': { borderColor: '#e56700', color: '#e56700' },
               px: 4,
+              width: { xs: '100%', sm: 'auto' },
             }}
           >
             Snooze (5 min)
@@ -523,6 +528,7 @@ export function Alarm() {
               backgroundColor: '#ff7300',
               '&:hover': { backgroundColor: '#e56700' },
               px: 4,
+              width: { xs: '100%', sm: 'auto' },
             }}
           >
             Dismiss
