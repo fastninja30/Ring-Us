@@ -21,7 +21,13 @@ import {
   Checkbox,
   Switch,
 } from '@mui/material';
-import { IoMdAdd, IoMdTrash, IoMdAlarm, IoMdNotifications, IoMdPeople } from 'react-icons/io';
+import {
+  IoMdAdd,
+  IoMdTrash,
+  IoMdAlarm,
+  IoMdNotifications,
+  IoMdPeople,
+} from 'react-icons/io';
 import { AlarmData } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { useFriends } from '../contexts/FriendsContext';
@@ -101,7 +107,13 @@ interface DisplayAlarm {
 export function Alarm() {
   const { user } = useAuth();
   const { friends } = useFriends();
-  const { sharedAlarms, createSharedAlarm, toggleSharedAlarm, deleteSharedAlarm, leaveSharedAlarm } = useSharedAlarms();
+  const {
+    sharedAlarms,
+    createSharedAlarm,
+    toggleSharedAlarm,
+    deleteSharedAlarm,
+    leaveSharedAlarm,
+  } = useSharedAlarms();
 
   const [alarms, setAlarms] = useState<AlarmData[]>(loadAlarms);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -119,7 +131,10 @@ export function Alarm() {
 
   // Merge local and shared alarms into a single sorted list
   const allAlarms: DisplayAlarm[] = useMemo(() => {
-    const local: DisplayAlarm[] = alarms.map((a) => ({ ...a, isShared: false }));
+    const local: DisplayAlarm[] = alarms.map((a) => ({
+      ...a,
+      isShared: false,
+    }));
     const shared: DisplayAlarm[] = sharedAlarms.map((a) => ({
       id: a.id,
       hour: a.hour,
@@ -132,7 +147,9 @@ export function Alarm() {
       ownerName: a.ownerName,
       participantNames: a.participantNames,
     }));
-    return [...local, ...shared].sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
+    return [...local, ...shared].sort(
+      (a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute),
+    );
   }, [alarms, sharedAlarms]);
 
   // Update current time every second
@@ -158,7 +175,8 @@ export function Alarm() {
       if (firedAlarmsRef.current.has(alarmFiredKey)) return;
 
       if (alarm.hour === currentHour && alarm.minute === currentMinute) {
-        const shouldFire = alarm.days.length === 0 || alarm.days.includes(currentDay);
+        const shouldFire =
+          alarm.days.length === 0 || alarm.days.includes(currentDay);
         if (!shouldFire) return;
 
         firedAlarmsRef.current.add(alarmFiredKey);
@@ -171,7 +189,8 @@ export function Alarm() {
         if (Notification.permission === 'granted') {
           const body = alarm.isShared
             ? `Shared alarm - ${alarm.label || formatTime(alarm.hour, alarm.minute, is24Hour)}`
-            : alarm.label || `Alarm - ${formatTime(alarm.hour, alarm.minute, is24Hour)}`;
+            : alarm.label ||
+              `Alarm - ${formatTime(alarm.hour, alarm.minute, is24Hour)}`;
           new Notification('Ring-Us Alarm', {
             body,
             requireInteraction: true,
@@ -215,7 +234,14 @@ export function Alarm() {
     const hour = parseInt(newHour, 10);
     const minute = parseInt(newMinute, 10);
 
-    if (Number.isNaN(hour) || Number.isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    if (
+      Number.isNaN(hour) ||
+      Number.isNaN(minute) ||
+      hour < 0 ||
+      hour > 23 ||
+      minute < 0 ||
+      minute > 59
+    ) {
       return;
     }
 
@@ -240,7 +266,9 @@ export function Alarm() {
         days: [...newDays],
       };
 
-      const updated = [...alarms, newAlarm].sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
+      const updated = [...alarms, newAlarm].sort(
+        (a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute),
+      );
       setAlarms(updated);
       saveAlarms(updated);
     }
@@ -296,7 +324,9 @@ export function Alarm() {
       enabled: true,
       days: [],
     };
-    const updated = [...alarms, snoozeAlarm].sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
+    const updated = [...alarms, snoozeAlarm].sort(
+      (a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute),
+    );
     setAlarms(updated);
     saveAlarms(updated);
     setFiringAlarm(null);
@@ -317,12 +347,10 @@ export function Alarm() {
   // Get other participants' names for display (excluding current user)
   const getOtherParticipants = (alarm: DisplayAlarm): string => {
     if (!alarm.participantNames) return '';
-    const others = alarm.participantNames.filter(
-      (_, i) => {
-        const sharedAlarm = sharedAlarms.find((sa) => sa.id === alarm.id);
-        return sharedAlarm && sharedAlarm.participants[i] !== user?.uid;
-      }
-    );
+    const others = alarm.participantNames.filter((_, i) => {
+      const sharedAlarm = sharedAlarms.find((sa) => sa.id === alarm.id);
+      return sharedAlarm && sharedAlarm.participants[i] !== user?.uid;
+    });
     return others.join(', ');
   };
 
@@ -349,8 +377,18 @@ export function Alarm() {
       </Box>
 
       {/* Header with add button */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mb: 2,
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+        >
           <IoMdAlarm /> Alarms
         </Typography>
         <Button
@@ -368,10 +406,16 @@ export function Alarm() {
 
       {/* Alarm list */}
       {allAlarms.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center', background: 'rgba(30, 30, 30, 0.7)' }}>
+        <Paper
+          sx={{
+            p: 4,
+            textAlign: 'center',
+            background: 'rgba(30, 30, 30, 0.7)',
+          }}
+        >
           <IoMdAlarm style={{ fontSize: 48, color: '#666', marginBottom: 8 }} />
           <Typography color="text.secondary">
-            No alarms set. Tap "Add Alarm" to create one.
+            No alarms set. Tap &quot;Add Alarm&quot; to create one.
           </Typography>
         </Paper>
       ) : (
@@ -398,7 +442,9 @@ export function Alarm() {
                         {alarm.label && (
                           <Typography
                             variant="body2"
-                            sx={{ color: alarm.enabled ? 'text.secondary' : '#555' }}
+                            sx={{
+                              color: alarm.enabled ? 'text.secondary' : '#555',
+                            }}
                           >
                             {alarm.label}
                           </Typography>
@@ -406,14 +452,24 @@ export function Alarm() {
                         {alarm.isShared && (
                           <Typography
                             variant="body2"
-                            sx={{ color: alarm.enabled ? '#ff7300' : '#555', fontSize: '0.75rem' }}
+                            sx={{
+                              color: alarm.enabled ? '#ff7300' : '#555',
+                              fontSize: '0.75rem',
+                            }}
                           >
                             {alarm.ownerId === user?.uid
                               ? `with ${getOtherParticipants(alarm)}`
                               : `by ${alarm.ownerName}`}
                           </Typography>
                         )}
-                        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            gap: 0.5,
+                            mt: 0.5,
+                            flexWrap: 'wrap',
+                          }}
+                        >
                           {alarm.isShared && (
                             <Chip
                               icon={<IoMdPeople style={{ fontSize: 14 }} />}
@@ -450,7 +506,9 @@ export function Alarm() {
                                   fontSize: '0.7rem',
                                   height: 20,
                                   color: alarm.enabled ? '#ff7300' : '#555',
-                                  borderColor: alarm.enabled ? '#ff7300' : '#555',
+                                  borderColor: alarm.enabled
+                                    ? '#ff7300'
+                                    : '#555',
                                 }}
                                 variant="outlined"
                               />
@@ -460,15 +518,20 @@ export function Alarm() {
                       </Box>
                     }
                   />
-                  <ListItemSecondaryAction sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ListItemSecondaryAction
+                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                  >
                     <Switch
                       checked={alarm.enabled}
                       onChange={() => handleToggleAlarm(alarm)}
                       sx={{
-                        '& .MuiSwitch-switchBase.Mui-checked': { color: '#ff7300' },
-                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                          backgroundColor: '#ff7300',
+                        '& .MuiSwitch-switchBase.Mui-checked': {
+                          color: '#ff7300',
                         },
+                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track':
+                          {
+                            backgroundColor: '#ff7300',
+                          },
                       }}
                     />
                     <IconButton
@@ -495,7 +558,15 @@ export function Alarm() {
       >
         <DialogTitle>Set New Alarm</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, my: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              my: 2,
+            }}
+          >
             <TextField
               value={newHour}
               onChange={(e) => {
@@ -510,7 +581,9 @@ export function Alarm() {
               size="small"
               placeholder="HH"
             />
-            <Typography variant="h3" sx={{ fontWeight: 300 }}>:</Typography>
+            <Typography variant="h3" sx={{ fontWeight: 300 }}>
+              :
+            </Typography>
             <TextField
               value={newMinute}
               onChange={(e) => {
@@ -589,7 +662,10 @@ export function Alarm() {
                 ))}
               </FormGroup>
               {selectedFriends.length > 0 && (
-                <Typography variant="caption" sx={{ color: '#ff7300', mt: 0.5, display: 'block' }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: '#ff7300', mt: 0.5, display: 'block' }}
+                >
                   This alarm will sync with selected friends.
                 </Typography>
               )}
@@ -597,7 +673,10 @@ export function Alarm() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowAddDialog(false)} sx={{ color: 'text.secondary' }}>
+          <Button
+            onClick={() => setShowAddDialog(false)}
+            sx={{ color: 'text.secondary' }}
+          >
             Cancel
           </Button>
           <Button
@@ -634,7 +713,8 @@ export function Alarm() {
             }}
           />
           <Typography variant="h3" sx={{ mt: 2, fontWeight: 300 }}>
-            {firingAlarm && formatTime(firingAlarm.hour, firingAlarm.minute, is24Hour)}
+            {firingAlarm &&
+              formatTime(firingAlarm.hour, firingAlarm.minute, is24Hour)}
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
             {firingAlarm?.label || 'Alarm'}

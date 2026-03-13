@@ -15,7 +15,12 @@ import {
   Snackbar,
   CircularProgress,
 } from '@mui/material';
-import { IoMdCopy, IoMdPersonAdd, IoMdClose, IoMdCheckmark } from 'react-icons/io';
+import {
+  IoMdCopy,
+  IoMdPersonAdd,
+  IoMdClose,
+  IoMdCheckmark,
+} from 'react-icons/io';
 import { useFriends } from '../contexts/FriendsContext';
 
 export function Friends() {
@@ -101,7 +106,9 @@ export function Friends() {
 
       {/* Your Friend Code */}
       <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>Your Friend Code</Typography>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Your Friend Code
+        </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Share this code with friends so they can add you.
         </Typography>
@@ -125,22 +132,38 @@ export function Friends() {
 
       {/* Add a Friend */}
       <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
-        <Typography variant="h6" sx={{ mb: 1 }}>Add a Friend</Typography>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Add a Friend
+        </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Enter your friend's 6-character code to send them a request.
+          Enter your friend&apos;s 6-character code to send them a request.
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
 
         <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
             value={friendCode}
-            onChange={(e) => setFriendCode(e.target.value.toUpperCase().slice(0, 6))}
+            onChange={(e) =>
+              setFriendCode(e.target.value.toUpperCase().slice(0, 6))
+            }
             placeholder="e.g. A7K2M9"
             size="small"
             inputProps={{
-              style: { fontFamily: 'monospace', letterSpacing: 2, textTransform: 'uppercase' },
+              style: {
+                fontFamily: 'monospace',
+                letterSpacing: 2,
+                textTransform: 'uppercase',
+              },
               maxLength: 6,
             }}
             sx={{ flex: 1 }}
@@ -149,7 +172,13 @@ export function Friends() {
             variant="contained"
             onClick={handleSendRequest}
             disabled={sending || friendCode.length < 6}
-            startIcon={sending ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : <IoMdPersonAdd />}
+            startIcon={
+              sending ? (
+                <CircularProgress size={16} sx={{ color: '#fff' }} />
+              ) : (
+                <IoMdPersonAdd />
+              )
+            }
             sx={{
               backgroundColor: '#ff7300',
               '&:hover': { backgroundColor: '#e56700' },
@@ -163,7 +192,9 @@ export function Friends() {
       {/* Pending Requests */}
       {(pendingRequests.length > 0 || outgoingRequests.length > 0) && (
         <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>Pending Requests</Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Pending Requests
+          </Typography>
 
           {pendingRequests.length > 0 && (
             <>
@@ -222,7 +253,9 @@ export function Friends() {
 
       {/* Friends List */}
       <Paper sx={{ p: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>Your Friends</Typography>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Your Friends
+        </Typography>
         {friends.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No friends yet. Share your friend code to get started!

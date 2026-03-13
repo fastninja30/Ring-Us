@@ -17,9 +17,23 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock, IoMdPerson } from 'react-icons/io';
+import {
+  IoMdEye,
+  IoMdEyeOff,
+  IoMdMail,
+  IoMdLock,
+  IoMdPerson,
+} from 'react-icons/io';
+import {
+  doc,
+  setDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
-import { doc, setDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 
 export function Signup() {
   const navigate = useNavigate();
@@ -61,16 +75,23 @@ export function Signup() {
       // Create Firestore user profile with friend code
       const friendCodeChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let friendCode = '';
-      for (let i = 0; i < 6; i++) {
-        friendCode += friendCodeChars.charAt(Math.floor(Math.random() * friendCodeChars.length));
+      for (let i = 0; i < 6; i += 1) {
+        friendCode += friendCodeChars.charAt(
+          Math.floor(Math.random() * friendCodeChars.length),
+        );
       }
       // Check uniqueness and retry if needed
-      const codeQuery = query(collection(db, 'users'), where('friendCode', '==', friendCode));
+      const codeQuery = query(
+        collection(db, 'users'),
+        where('friendCode', '==', friendCode),
+      );
       const codeSnap = await getDocs(codeQuery);
       if (!codeSnap.empty) {
         friendCode = '';
-        for (let i = 0; i < 6; i++) {
-          friendCode += friendCodeChars.charAt(Math.floor(Math.random() * friendCodeChars.length));
+        for (let i = 0; i < 6; i += 1) {
+          friendCode += friendCodeChars.charAt(
+            Math.floor(Math.random() * friendCodeChars.length),
+          );
         }
       }
       await setDoc(doc(db, 'users', user.uid), {

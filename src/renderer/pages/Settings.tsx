@@ -13,7 +13,11 @@ import {
   Chip,
   IconButton,
 } from '@mui/material';
-import { IoMdPhonePortrait, IoMdCheckmarkCircle, IoMdCopy } from 'react-icons/io';
+import {
+  IoMdPhonePortrait,
+  IoMdCheckmarkCircle,
+  IoMdCopy,
+} from 'react-icons/io';
 import {
   PhoneAuthProvider,
   linkWithCredential,
@@ -226,7 +230,9 @@ export function Settings() {
           </Box>
 
           <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" color="text.secondary">Phone</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Phone
+            </Typography>
             {user.phoneNumber ? (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="body1">{user.phoneNumber}</Typography>
@@ -247,11 +253,17 @@ export function Settings() {
           </Box>
 
           <Box>
-            <Typography variant="body2" color="text.secondary">Friend Code</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Friend Code
+            </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
                 variant="body1"
-                sx={{ fontFamily: 'monospace', letterSpacing: 2, color: '#ff7300' }}
+                sx={{
+                  fontFamily: 'monospace',
+                  letterSpacing: 2,
+                  color: '#ff7300',
+                }}
               >
                 {userProfile?.friendCode || '------'}
               </Typography>
