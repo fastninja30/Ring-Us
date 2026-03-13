@@ -16,6 +16,8 @@ import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { VerifyEmail } from './pages/VerifyEmail';
 
+const drawerWidth = 240;
+
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -46,9 +48,18 @@ export default function App() {
       <AuthProvider>  
       <Router> 
         <CssBaseline />
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
           <Navbar />
-          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Box 
+            component="main" 
+            sx={{ 
+              flexGrow: 1, 
+              p: { xs: 2, sm: 3 },
+              mt: { xs: 6, md: 0 },
+              ml: { xs: 0, md: `${drawerWidth}px` },
+              width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+            }}
+          >
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Login />} />
