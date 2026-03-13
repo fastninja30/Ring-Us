@@ -16,12 +16,16 @@ import {
   InputAdornment,
   Alert,
   CircularProgress,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock, IoMdPerson } from 'react-icons/io';
 import { auth } from '../firebaseConfig';
 
 export function Signup() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -85,12 +89,13 @@ export function Signup() {
         alignItems: 'center',
         justifyContent: 'center',
         background: 'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        p: { xs: 2, sm: 3 },
       }}
     >
       <Paper
         elevation={8}
         sx={{
-          p: 4,
+          p: { xs: 3, sm: 4 },
           width: '100%',
           maxWidth: 420,
           borderRadius: 3,

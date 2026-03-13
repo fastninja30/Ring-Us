@@ -62,12 +62,13 @@ export function VerifyEmail() {
         alignItems: 'center',
         justifyContent: 'center',
         background: 'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        p: { xs: 2, sm: 3 },
       }}
     >
       <Paper
         elevation={8}
         sx={{
-          p: 4,
+          p: { xs: 3, sm: 4 },
           width: '100%',
           maxWidth: 460,
           borderRadius: 3,
@@ -76,7 +77,9 @@ export function VerifyEmail() {
           textAlign: 'center',
         }}
       >
-        <IoMdMail style={{ fontSize: 64, color: '#ff7300', marginBottom: 16 }} />
+        <Box sx={{ fontSize: { xs: 48, sm: 64 }, color: '#ff7300', mb: 0.5, display: 'inline-flex' }}>
+          <IoMdMail />
+        </Box>
 
         <Typography variant="h4" sx={{ fontWeight: 800, color: '#F4F3F2', mb: 1 }}>
           Verify Your Email
