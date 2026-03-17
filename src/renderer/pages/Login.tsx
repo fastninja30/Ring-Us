@@ -96,14 +96,14 @@ export function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background:
-          'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        background: 'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        p: { xs: 2, sm: 3 },
       }}
     >
       <Paper
         elevation={8}
         sx={{
-          p: 4,
+          p: { xs: 3, sm: 4 },
           width: '100%',
           maxWidth: 420,
           borderRadius: 3,

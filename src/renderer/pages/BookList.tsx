@@ -6,6 +6,20 @@ import {
   deleteDoc,
   doc,
 } from 'firebase/firestore';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
+  CircularProgress,
+} from '@mui/material';
+import { IoMdAdd, IoMdTrash, IoMdRefresh } from 'react-icons/io';
 import { db } from '../firebaseConfig';
 
 interface Book {
@@ -96,78 +110,111 @@ export function BookList() {
     }
   };
 
-  // Helper function to handle conditional rendering
-  const renderBookList = () => {
-    if (loading && books.length === 0) {
-      return <p>Loading books...</p>;
-    }
-
-    if (books.length === 0) {
-      return <p>No books found in the database.</p>;
-    }
-
-    return (
-      <ul>
-        {books.map((book) => (
-          <li key={book.id} style={{ marginBottom: '8px' }}>
-            <strong>{book.title}</strong>
-            {book.author ? `by ${book.author}` : ''}
-            <button
-              type="button"
-              onClick={() => handleDeleteBook(book.id)}
-              disabled={deletingId === book.id}
-              style={{ marginLeft: '15px', color: 'red', cursor: 'pointer' }}
-            >
-              {deletingId === book.id ? 'Deleting...' : 'Delete'}
-            </button>
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
   return (
-    <div>
-      <h1>BookList Page</h1>
+    <Box sx={{ maxWidth: 600, mx: 'auto', mt: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 } }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}>
+        Book List
+      </Typography>
 
       {/* Control Panel: Input, Add Button, and Reload Button */}
-      <div
-        style={{
-          marginBottom: '20px',
-          padding: '10px',
-          border: '1px solid #ccc',
-        }}
-      >
-        <input
-          type="text"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Enter book title..."
-          disabled={isAdding}
-          style={{ marginRight: '10px', padding: '5px' }}
-        />
-        {/* Add Book Button */}
-        <button
-          type="button"
-          onClick={handleAddBook}
-          disabled={isAdding || !newTitle.trim()}
-        >
-          {isAdding ? 'Adding...' : 'Add Book'}
-        </button>
-
-        {/* Reload List Button */}
-        <button
-          type="button"
-          onClick={fetchBooks}
-          disabled={loading}
-          style={{ marginLeft: '10px' }}
-        >
-          {loading ? 'Loading...' : 'Reload List'}
-        </button>
-      </div>
+      <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+          <TextField
+            fullWidth
+            label="Book Title"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            placeholder="Enter book title..."
+            disabled={isAdding}
+            size="small"
+          />
+          <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+            <Button
+              variant="contained"
+              startIcon={<IoMdAdd />}
+              onClick={handleAddBook}
+              disabled={isAdding || !newTitle.trim()}
+              sx={{
+                backgroundColor: '#ff7300',
+                '&:hover': { backgroundColor: '#e56700' },
+                width: { xs: '100%', sm: 'auto' },
+              }}
+            >
+              {isAdding ? <CircularProgress size={20} /> : 'Add'}
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<IoMdRefresh />}
+              onClick={fetchBooks}
+              disabled={loading}
+              sx={{
+                borderColor: '#ff7300',
+                color: '#ff7300',
+                '&:hover': { borderColor: '#e56700', color: '#e56700' },
+                width: { xs: '100%', sm: 'auto' },
+              }}
+            >
+              {loading ? <CircularProgress size={20} /> : 'Reload'}
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
 
       {/* Display the Data */}
-      {renderBookList()}
-    </div>
+      {loading && books.length === 0 ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress sx={{ color: '#ff7300' }} />
+        </Box>
+      ) : books.length === 0 ? (
+        <Paper sx={{ p: 4, textAlign: 'center', background: 'rgba(30, 30, 30, 0.7)' }}>
+          <Typography color="text.secondary">
+            No books found in the database.
+          </Typography>
+        </Paper>
+      ) : (
+        <Paper sx={{ background: 'rgba(30, 30, 30, 0.7)' }}>
+          <List>
+            {books.map((book, index) => (
+              <ListItem
+                key={book.id}
+                sx={{
+                  borderBottom: index < books.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  alignItems: { xs: 'flex-start', sm: 'center' },
+                }}
+              >
+                <ListItemText
+                  primary={
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {book.title}
+                    </Typography>
+                  }
+                  secondary={
+                    book.author ? (
+                      <Typography variant="body2" color="text.secondary">
+                        by {book.author}
+                      </Typography>
+                    ) : null
+                  }
+                />
+                <ListItemSecondaryAction sx={{ position: { xs: 'relative', sm: 'absolute' }, right: { xs: 0, sm: 8 }, top: { xs: 'unset', sm: '50%' }, transform: { xs: 'none', sm: 'translateY(-50%)' }, mt: { xs: 1, sm: 0 } }}>
+                  <IconButton
+                    onClick={() => handleDeleteBook(book.id)}
+                    disabled={deletingId === book.id}
+                    sx={{ color: '#ff4444' }}
+                  >
+                    {deletingId === book.id ? (
+                      <CircularProgress size={20} sx={{ color: '#ff4444' }} />
+                    ) : (
+                      <IoMdTrash />
+                    )}
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
+      )}
+    </Box>
   );
 }

@@ -1,5 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material'; 
+import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
 import './App.css';
@@ -17,6 +17,8 @@ import { Friends } from './pages/Friends';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { VerifyEmail } from './pages/VerifyEmail';
+
+const drawerWidth = 240;
 
 const theme = createTheme({
   palette: {
@@ -49,6 +51,18 @@ export default function App() {
         <FriendsProvider>
         <Router>
           <CssBaseline />
+          <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+          <Navbar />
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              p: { xs: 2, sm: 3 },
+              mt: { xs: 6, md: 0 },
+              ml: { xs: 0, md: `${drawerWidth}px` },
+              width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+            }}
+          >
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Login />} />
@@ -78,6 +92,8 @@ export default function App() {
               <ProtectedLayout><Friends /></ProtectedLayout>
             } />
           </Routes>
+          </Box>
+          </Box>
         </Router>
         </FriendsProvider>
       </AuthProvider>
