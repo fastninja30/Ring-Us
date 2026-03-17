@@ -27,23 +27,45 @@ export function Clock() {
     };
   }, []);
 
-    return (
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: 'calc(100vh - 100px)',
-            p: { xs: 2, sm: 3 }
-        }}>
-            <Paper sx={{ p: 4, background: 'rgba(30, 30, 30, 0.7)', textAlign: 'center', width: '100%', maxWidth: 400 }}>
-                <Typography variant="h2" sx={{ fontWeight: 300, color: '#F4F3F2', fontSize: { xs: '3rem', sm: '4rem' } }}>
-                    {time.toLocaleTimeString('en-US', { hour12: !is24Hour, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </Typography>
-                <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
-                    {time.toLocaleDateString()}
-                </Typography>
-            </Paper>
-        </Box>
-    );
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - 100px)',
+        p: { xs: 2, sm: 3 },
+      }}
+    >
+      <Paper
+        sx={{
+          p: 4,
+          background: 'rgba(30, 30, 30, 0.7)',
+          textAlign: 'center',
+          width: '100%',
+          maxWidth: 400,
+        }}
+      >
+        <Typography
+          variant="h2"
+          sx={{
+            fontWeight: 300,
+            color: '#F4F3F2',
+            fontSize: { xs: '3rem', sm: '4rem' },
+          }}
+        >
+          {time.toLocaleTimeString('en-US', {
+            hour12: !is24Hour,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          })}
+        </Typography>
+        <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
+          {time.toLocaleDateString()}
+        </Typography>
+      </Paper>
+    </Box>
+  );
 }

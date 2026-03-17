@@ -1,4 +1,11 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  MutableRefObject
+} from 'react';
 import {
   Box,
   Typography,
@@ -59,7 +66,7 @@ function saveAlarms(alarms: AlarmData[]) {
 
 // Generate an alarm tone using Web Audio API
 function playAlarmSound(
-  audioContextRef: React.MutableRefObject<AudioContext | null>,
+  audioContextRef: MutableRefObject<AudioContext | null>,
 ) {
   try {
     if (!audioContextRef.current) {
@@ -191,7 +198,7 @@ export function Alarm() {
             ? `Shared alarm - ${alarm.label || formatTime(alarm.hour, alarm.minute, is24Hour)}`
             : alarm.label ||
               `Alarm - ${formatTime(alarm.hour, alarm.minute, is24Hour)}`;
-          new Notification('Ring-Us Alarm', {
+          const notification = new Notification('Ring-Us Alarm', {
             body,
             requireInteraction: true,
           });
@@ -355,10 +362,20 @@ export function Alarm() {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', mt: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 } }}>
+    <Box
+      sx={{
+        maxWidth: 600,
+        mx: 'auto',
+        mt: { xs: 2, sm: 4 },
+        px: { xs: 2, sm: 3 },
+      }}
+    >
       {/* Current time display */}
       <Box sx={{ textAlign: 'center', mb: { xs: 2, sm: 4 } }}>
-        <Typography variant="h2" sx={{ fontWeight: 300, fontSize: { xs: '2.5rem', sm: '3rem' } }}>
+        <Typography
+          variant="h2"
+          sx={{ fontWeight: 300, fontSize: { xs: '2.5rem', sm: '3rem' } }}
+        >
           {currentTime.toLocaleTimeString('en-US', {
             hour12: !is24Hour,
             hour: '2-digit',
@@ -425,7 +442,13 @@ export function Alarm() {
             {allAlarms.map((alarm, index) => (
               <Box key={`${alarm.isShared ? 'shared' : 'local'}-${alarm.id}`}>
                 {index > 0 && <Divider />}
-                <ListItem sx={{ py: 2, flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' } }}>
+                <ListItem
+                  sx={{
+                    py: 2,
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                  }}
+                >
                   <ListItemText
                     primary={
                       <Typography
@@ -520,7 +543,17 @@ export function Alarm() {
                       </Box>
                     }
                   />
-                  <ListItemSecondaryAction sx={{ display: 'flex', alignItems: 'center', gap: 1, position: { xs: 'relative', sm: 'absolute' }, right: { xs: 0, sm: 'unset' }, top: { xs: 'unset', sm: 'unset' }, mt: { xs: 1, sm: 0 } }}>
+                  <ListItemSecondaryAction
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      position: { xs: 'relative', sm: 'absolute' },
+                      right: { xs: 0, sm: 'unset' },
+                      top: { xs: 'unset', sm: 'unset' },
+                      mt: { xs: 1, sm: 0 },
+                    }}
+                  >
                     <Switch
                       checked={alarm.enabled}
                       onChange={() => handleToggleAlarm(alarm)}
@@ -553,12 +586,24 @@ export function Alarm() {
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
         PaperProps={{
-          sx: { background: 'rgba(30, 30, 30, 0.95)', minWidth: { xs: '90%', sm: 350 } },
+          sx: {
+            background: 'rgba(30, 30, 30, 0.95)',
+            minWidth: { xs: '90%', sm: 350 },
+          },
         }}
       >
         <DialogTitle>Set New Alarm</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, my: 2, flexWrap: 'wrap' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              my: 2,
+              flexWrap: 'wrap',
+            }}
+          >
             <TextField
               value={newHour}
               onChange={(e) => {
@@ -664,8 +709,17 @@ export function Alarm() {
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 1, sm: 0 }, width: { xs: '100%', sm: 'auto' } }}>
-          <Button onClick={() => setShowAddDialog(false)} sx={{ color: 'text.secondary', width: { xs: '100%', sm: 'auto' } }}>
+        <DialogActions
+          sx={{
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 0 },
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
+          <Button
+            onClick={() => setShowAddDialog(false)}
+            sx={{ color: 'text.secondary', width: { xs: '100%', sm: 'auto' } }}
+          >
             Cancel
           </Button>
           <Button
@@ -724,7 +778,15 @@ export function Alarm() {
             />
           )}
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2, flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
+        <DialogActions
+          sx={{
+            justifyContent: 'center',
+            pb: 3,
+            gap: 2,
+            flexDirection: { xs: 'column', sm: 'row' },
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
           <Button
             onClick={handleSnooze}
             variant="outlined"

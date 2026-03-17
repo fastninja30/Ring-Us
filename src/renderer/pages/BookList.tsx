@@ -111,14 +111,32 @@ export function BookList() {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', mt: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 } }}>
-      <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}>
+    <Box
+      sx={{
+        maxWidth: 600,
+        mx: 'auto',
+        mt: { xs: 2, sm: 4 },
+        px: { xs: 2, sm: 3 },
+      }}
+    >
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}
+      >
         Book List
       </Typography>
 
       {/* Control Panel: Input, Add Button, and Reload Button */}
-      <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+      <Paper
+        sx={{ p: { xs: 2, sm: 3 }, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2,
+          }}
+        >
           <TextField
             fullWidth
             label="Book Title"
@@ -128,7 +146,9 @@ export function BookList() {
             disabled={isAdding}
             size="small"
           />
-          <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+          <Box
+            sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}
+          >
             <Button
               variant="contained"
               startIcon={<IoMdAdd />}

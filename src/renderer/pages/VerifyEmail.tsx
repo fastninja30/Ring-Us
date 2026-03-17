@@ -65,7 +65,8 @@ export function VerifyEmail() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        background:
+          'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -81,7 +82,14 @@ export function VerifyEmail() {
           textAlign: 'center',
         }}
       >
-        <Box sx={{ fontSize: { xs: 48, sm: 64 }, color: '#ff7300', mb: 0.5, display: 'inline-flex' }}>
+        <Box
+          sx={{
+            fontSize: { xs: 48, sm: 64 },
+            color: '#ff7300',
+            mb: 0.5,
+            display: 'inline-flex',
+          }}
+        >
           <IoMdMail />
         </Box>
 

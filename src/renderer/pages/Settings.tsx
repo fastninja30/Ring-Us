@@ -153,14 +153,29 @@ export function Settings() {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', mt: { xs: 2, sm: 4 }, px: { xs: 2, sm: 3 } }}>
+    <Box
+      sx={{
+        maxWidth: 600,
+        mx: 'auto',
+        mt: { xs: 2, sm: 4 },
+        px: { xs: 2, sm: 3 },
+      }}
+    >
       <Typography variant="h4" sx={{ fontWeight: 700, mb: { xs: 2, sm: 3 } }}>
         Settings
       </Typography>
 
       {/* Clock Settings */}
-      <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 }, background: 'rgba(30, 30, 30, 0.7)' }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>Clock</Typography>
+      <Paper
+        sx={{
+          p: { xs: 2, sm: 3 },
+          mb: { xs: 2, sm: 3 },
+          background: 'rgba(30, 30, 30, 0.7)',
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Clock
+        </Typography>
         <FormControlLabel
           control={
             <Switch
@@ -180,8 +195,16 @@ export function Settings() {
 
       {/* Account Info */}
       {user && (
-        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 }, background: 'rgba(30, 30, 30, 0.7)' }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>Account</Typography>
+        <Paper
+          sx={{
+            p: { xs: 2, sm: 3 },
+            mb: { xs: 2, sm: 3 },
+            background: 'rgba(30, 30, 30, 0.7)',
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Account
+          </Typography>
 
           <Box sx={{ mb: 2 }}>
             <Typography variant="body2" color="text.secondary">
@@ -230,7 +253,14 @@ export function Settings() {
               Phone
             </Typography>
             {user.phoneNumber ? (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
                 <Typography variant="body1">{user.phoneNumber}</Typography>
                 <Chip
                   icon={<IoMdCheckmarkCircle />}
@@ -281,7 +311,13 @@ export function Settings() {
 
       {/* Phone Verification */}
       {user && !user.phoneNumber && (
-        <Paper sx={{ p: { xs: 2, sm: 3 }, mb: { xs: 2, sm: 3 }, background: 'rgba(30, 30, 30, 0.7)' }}>
+        <Paper
+          sx={{
+            p: { xs: 2, sm: 3 },
+            mb: { xs: 2, sm: 3 },
+            background: 'rgba(30, 30, 30, 0.7)',
+          }}
+        >
           <Typography variant="h6" sx={{ mb: 2 }}>
             <IoMdPhonePortrait
               style={{ verticalAlign: 'middle', marginRight: 8 }}
@@ -348,7 +384,13 @@ export function Settings() {
                 placeholder="123456"
                 sx={{ mb: 2 }}
               />
-              <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 2,
+                  flexDirection: { xs: 'column', sm: 'row' },
+                }}
+              >
                 <Button
                   fullWidth
                   variant="contained"
