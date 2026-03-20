@@ -4,7 +4,7 @@ import {
   useRef,
   useCallback,
   useMemo,
-  MutableRefObject
+  MutableRefObject,
 } from 'react';
 import {
   Box,

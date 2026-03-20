@@ -39,7 +39,6 @@ export function BookList() {
   // State variable to track which book is currently being deleted
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // 1. Extract the fetch logic into a standalone function
   const fetchBooks = async () => {
     setLoading(true);
     try {
@@ -59,12 +58,10 @@ export function BookList() {
     }
   };
 
-  // 2. Call fetchBooks when the component first loads
   useEffect(() => {
     fetchBooks();
   }, []);
 
-  // 3. Create a function to handle adding data to Firestore
   const handleAddBook = async () => {
     if (!newTitle.trim()) return;
 
@@ -72,21 +69,17 @@ export function BookList() {
     try {
       const booksCollection = collection(db, 'books');
 
-      // Capture the document reference returned by addDoc
       const docRef = await addDoc(booksCollection, {
         title: newTitle.trim(),
       });
 
-      // Create the new book object locally
       const newBook: Book = {
         id: docRef.id,
         title: newTitle.trim(),
       };
 
-      // Instantly update the local state so the UI reflects the addition
       setBooks((prevBooks) => [...prevBooks, newBook]);
-
-      setNewTitle(''); // Clear the input field
+      setNewTitle('');
     } catch (error) {
       console.error('Error adding book: ', error);
     } finally {
@@ -94,14 +87,12 @@ export function BookList() {
     }
   };
 
-  // 4. Create a function to handle deleting a specific document
   const handleDeleteBook = async (id: string) => {
     setDeletingId(id);
     try {
       const bookDocRef = doc(db, 'books', id);
       await deleteDoc(bookDocRef);
 
-      // Instantly update local state so the UI reflects the deletion
       setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
     } catch (error) {
       console.error('Error deleting book: ', error);
@@ -126,7 +117,6 @@ export function BookList() {
         Book List
       </Typography>
 
-      {/* Control Panel: Input, Add Button, and Reload Button */}
       <Paper
         sx={{ p: { xs: 2, sm: 3 }, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}
       >
@@ -160,7 +150,8 @@ export function BookList() {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              {isAdding ? <CircularProgress size={20} /> : 'Add'}
+              {isAdding && <CircularProgress size={20} />}
+              {!isAdding && 'Add'}
             </Button>
             <Button
               variant="outlined"
@@ -174,31 +165,45 @@ export function BookList() {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              {loading ? <CircularProgress size={20} /> : 'Reload'}
+              {loading && <CircularProgress size={20} />}
+              {!loading && 'Reload'}
             </Button>
           </Box>
         </Box>
       </Paper>
 
-      {/* Display the Data */}
-      {loading && books.length === 0 ? (
+      {/* Replaced nested ternaries with logical && operators */}
+      {loading && books.length === 0 && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress sx={{ color: '#ff7300' }} />
         </Box>
-      ) : books.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center', background: 'rgba(30, 30, 30, 0.7)' }}>
+      )}
+
+      {!loading && books.length === 0 && (
+        <Paper
+          sx={{
+            p: 4,
+            textAlign: 'center',
+            background: 'rgba(30, 30, 30, 0.7)',
+          }}
+        >
           <Typography color="text.secondary">
             No books found in the database.
           </Typography>
         </Paper>
-      ) : (
+      )}
+
+      {books.length > 0 && (
         <Paper sx={{ background: 'rgba(30, 30, 30, 0.7)' }}>
           <List>
             {books.map((book, index) => (
               <ListItem
                 key={book.id}
                 sx={{
-                  borderBottom: index < books.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                  borderBottom:
+                    index < books.length - 1
+                      ? '1px solid rgba(255,255,255,0.1)'
+                      : 'none',
                   flexDirection: { xs: 'column', sm: 'row' },
                   alignItems: { xs: 'flex-start', sm: 'center' },
                 }}
@@ -210,24 +215,32 @@ export function BookList() {
                     </Typography>
                   }
                   secondary={
-                    book.author ? (
+                    book.author && (
                       <Typography variant="body2" color="text.secondary">
                         by {book.author}
                       </Typography>
-                    ) : null
+                    )
                   }
                 />
-                <ListItemSecondaryAction sx={{ position: { xs: 'relative', sm: 'absolute' }, right: { xs: 0, sm: 8 }, top: { xs: 'unset', sm: '50%' }, transform: { xs: 'none', sm: 'translateY(-50%)' }, mt: { xs: 1, sm: 0 } }}>
+                <ListItemSecondaryAction
+                  sx={{
+                    position: { xs: 'relative', sm: 'absolute' },
+                    right: { xs: 0, sm: 8 },
+                    top: { xs: 'unset', sm: '50%' },
+                    transform: { xs: 'none', sm: 'translateY(-50%)' },
+                    mt: { xs: 1, sm: 0 },
+                  }}
+                >
                   <IconButton
                     onClick={() => handleDeleteBook(book.id)}
                     disabled={deletingId === book.id}
                     sx={{ color: '#ff4444' }}
                   >
-                    {deletingId === book.id ? (
+                    {/* Fixed line 185: Replaced ternary with logical && */}
+                    {deletingId === book.id && (
                       <CircularProgress size={20} sx={{ color: '#ff4444' }} />
-                    ) : (
-                      <IoMdTrash />
                     )}
+                    {deletingId !== book.id && <IoMdTrash />}
                   </IconButton>
                 </ListItemSecondaryAction>
               </ListItem>
