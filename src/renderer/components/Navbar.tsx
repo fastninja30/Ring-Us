@@ -15,7 +15,7 @@ import {
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { FaHome, FaRegClock } from 'react-icons/fa';
+import { FaHome, FaRegClock, FaUserFriends } from 'react-icons/fa';
 import { FaGear } from 'react-icons/fa6';
 import { IoMdAlarm, IoMdLogOut, IoMdMenu } from 'react-icons/io';
 import { GrCircleQuestion } from 'react-icons/gr';
@@ -113,6 +113,19 @@ export function Navbar() {
               <FaRegClock />
             </ListItemIcon>
             <ListItemText primary="Clock" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            component={NavLink}
+            to="/friends"
+            onClick={() => isMobile && setMobileOpen(false)}
+            sx={{ color: 'inherit' }}
+          >
+            <ListItemIcon sx={{ color: 'inherit' }}>
+              <FaUserFriends />
+            </ListItemIcon>
+            <ListItemText primary="Friends" />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
