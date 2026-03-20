@@ -34,6 +34,7 @@ import {
   IoMdAlarm,
   IoMdNotifications,
   IoMdPeople,
+  IoMdCreate,
 } from 'react-icons/io';
 import { AlarmData } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -120,10 +121,12 @@ export function Alarm() {
     toggleSharedAlarm,
     deleteSharedAlarm,
     leaveSharedAlarm,
+    updateSharedAlarm,
   } = useSharedAlarms();
 
   const [alarms, setAlarms] = useState<AlarmData[]>(loadAlarms);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingAlarm, setEditingAlarm] = useState<DisplayAlarm | null>(null);
   const [firingAlarm, setFiringAlarm] = useState<DisplayAlarm | null>(null);
   const [newHour, setNewHour] = useState('08');
   const [newMinute, setNewMinute] = useState('00');
@@ -286,6 +289,65 @@ export function Alarm() {
     setNewDays([]);
     setSelectedFriends([]);
     setShowAddDialog(false);
+  };
+
+  const handleUpdateAlarm = async () => {
+    if (!editingAlarm) return;
+
+    const hour = parseInt(newHour, 10);
+    const minute = parseInt(newMinute, 10);
+
+    if (
+      Number.isNaN(hour) ||
+      Number.isNaN(minute) ||
+      hour < 0 ||
+      hour > 23 ||
+      minute < 0 ||
+      minute > 59
+    ) {
+      return;
+    }
+
+    if (editingAlarm.isShared) {
+      await updateSharedAlarm(editingAlarm.id, {
+        hour,
+        minute,
+        label: newLabel,
+        days: [...newDays],
+      });
+    } else {
+      const updatedAlarms = alarms.map((a) =>
+        a.id === editingAlarm.id
+          ? { ...a, hour, minute, label: newLabel, days: [...newDays] }
+          : a,
+      );
+      setAlarms(updatedAlarms);
+      saveAlarms(updatedAlarms);
+    }
+
+    setEditingAlarm(null);
+    setNewHour('08');
+    setNewMinute('00');
+    setNewLabel('');
+    setNewDays([]);
+  };
+
+  useEffect(() => {
+    if (editingAlarm) {
+      setNewHour(String(editingAlarm.hour).padStart(2, '0'));
+      setNewMinute(String(editingAlarm.minute).padStart(2, '0'));
+      setNewLabel(editingAlarm.label);
+      setNewDays(editingAlarm.days);
+    } else {
+      setNewHour('08');
+      setNewMinute('00');
+      setNewLabel('');
+      setNewDays([]);
+    }
+  }, [editingAlarm]);
+
+  const handleShowEditDialog = (alarm: DisplayAlarm) => {
+    setEditingAlarm(alarm);
   };
 
   const handleDeleteAlarm = (alarm: DisplayAlarm) => {
@@ -567,6 +629,15 @@ export function Alarm() {
                           },
                       }}
                     />
+                    {((alarm.isShared && alarm.ownerId === user?.uid) ||
+                      !alarm.isShared) && (
+                      <IconButton
+                        onClick={() => handleShowEditDialog(alarm)}
+                        sx={{ color: '#aaa' }}
+                      >
+                        <IoMdCreate />
+                      </IconButton>
+                    )}
                     <IconButton
                       onClick={() => handleDeleteAlarm(alarm)}
                       sx={{ color: '#ff4444' }}
@@ -732,6 +803,123 @@ export function Alarm() {
             }}
           >
             Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Alarm Dialog */}
+      <Dialog
+        open={editingAlarm !== null}
+        onClose={() => setEditingAlarm(null)}
+        PaperProps={{
+          sx: {
+            background: 'rgba(30, 30, 30, 0.95)',
+            minWidth: { xs: '90%', sm: 350 },
+          },
+        }}
+      >
+        <DialogTitle>Edit Alarm</DialogTitle>
+        <DialogContent>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              my: 2,
+              flexWrap: 'wrap',
+            }}
+          >
+            <TextField
+              value={newHour}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                setNewHour(val);
+              }}
+              inputProps={{
+                style: { textAlign: 'center', fontSize: '2rem', width: '50px' },
+                maxLength: 2,
+              }}
+              variant="outlined"
+              size="small"
+              placeholder="HH"
+            />
+            <Typography variant="h3" sx={{ fontWeight: 300 }}>
+              :
+            </Typography>
+            <TextField
+              value={newMinute}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                setNewMinute(val);
+              }}
+              inputProps={{
+                style: { textAlign: 'center', fontSize: '2rem', width: '50px' },
+                maxLength: 2,
+              }}
+              variant="outlined"
+              size="small"
+              placeholder="MM"
+            />
+          </Box>
+
+          {/* Label */}
+          <TextField
+            fullWidth
+            label="Label (optional)"
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+
+          {/* Day selector */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Repeat (leave empty for one-time alarm)
+          </Typography>
+          <FormGroup row>
+            {DAY_LABELS.map((label, index) => (
+              <FormControlLabel
+                key={label}
+                control={
+                  <Checkbox
+                    checked={newDays.includes(index)}
+                    onChange={() => handleToggleDay(index)}
+                    sx={{
+                      color: '#666',
+                      '&.Mui-checked': { color: '#ff7300' },
+                      padding: '4px',
+                    }}
+                    size="small"
+                  />
+                }
+                label={label}
+              />
+            ))}
+          </FormGroup>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 0 },
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
+          <Button
+            onClick={() => setEditingAlarm(null)}
+            sx={{ color: 'text.secondary', width: { xs: '100%', sm: 'auto' } }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUpdateAlarm}
+            variant="contained"
+            sx={{
+              backgroundColor: '#ff7300',
+              '&:hover': { backgroundColor: '#e56700' },
+              width: { xs: '100%', sm: 'auto' },
+            }}
+          >
+            Save Changes
           </Button>
         </DialogActions>
       </Dialog>
