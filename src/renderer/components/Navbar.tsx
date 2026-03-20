@@ -157,11 +157,36 @@ export function Navbar() {
     <>
       {isMobile && (
         <IconButton
+          disableRipple
           color="inherit"
           aria-label="open drawer"
           edge="start"
           onClick={handleDrawerToggle}
-          sx={{ position: 'fixed', top: 8, left: 8, zIndex: 1300 }}
+          sx={{
+            position: 'fixed',
+            top: 12,
+            left: mobileOpen ? drawerWidth - 28 : 12,
+            zIndex: 1300,
+            width: 40,
+            height: 40,
+            p: 1,
+            border: 'none',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+            transition: theme.transitions.create('left', {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.shortest,
+            }),
+            '&:hover': {
+              backgroundColor: 'transparent',
+            },
+            '&:focus': {
+              outline: 'none',
+            },
+            '&:focus-visible': {
+              outline: 'none',
+            },
+          }}
         >
           <IoMdMenu />
         </IconButton>
