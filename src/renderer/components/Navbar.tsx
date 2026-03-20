@@ -82,29 +82,6 @@ export function Navbar() {
         <ListItem disablePadding>
           <ListItemButton
             component={NavLink}
-            to="/book-list"
-            onClick={() => isMobile && setMobileOpen(false)}
-            sx={{ color: 'inherit' }}
-          >
-            <ListItemText inset primary="Book list" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/about"
-            onClick={() => isMobile && setMobileOpen(false)}
-            sx={{ color: 'inherit' }}
-          >
-            <ListItemIcon sx={{ color: 'inherit' }}>
-              <GrCircleQuestion />
-            </ListItemIcon>
-            <ListItemText primary="About" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
             to="/clock"
             onClick={() => isMobile && setMobileOpen(false)}
             sx={{ color: 'inherit' }}
@@ -139,6 +116,19 @@ export function Navbar() {
               <FaGear />
             </ListItemIcon>
             <ListItemText primary="Settings" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            component={NavLink}
+            to="/about"
+            onClick={() => isMobile && setMobileOpen(false)}
+            sx={{ color: 'inherit' }}
+          >
+            <ListItemIcon sx={{ color: 'inherit' }}>
+              <GrCircleQuestion />
+            </ListItemIcon>
+            <ListItemText primary="About" />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
