@@ -27,6 +27,8 @@ import {
   FormControlLabel,
   Checkbox,
   Switch,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   IoMdAdd,
@@ -130,6 +132,7 @@ export function Alarm() {
   const [firingAlarm, setFiringAlarm] = useState<DisplayAlarm | null>(null);
   const [newHour, setNewHour] = useState('08');
   const [newMinute, setNewMinute] = useState('00');
+  const [newPeriod, setNewPeriod] = useState('AM');
   const [newLabel, setNewLabel] = useState('');
   const [newDays, setNewDays] = useState<number[]>([]);
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
@@ -241,7 +244,7 @@ export function Alarm() {
   }, []);
 
   const handleAddAlarm = async () => {
-    const hour = parseInt(newHour, 10);
+    let hour = parseInt(newHour, 10);
     const minute = parseInt(newMinute, 10);
 
     if (
@@ -253,6 +256,14 @@ export function Alarm() {
       minute > 59
     ) {
       return;
+    }
+
+    if (!is24Hour) {
+      if (newPeriod === 'PM' && hour !== 12) {
+        hour += 12;
+      } else if (newPeriod === 'AM' && hour === 12) {
+        hour = 0;
+      }
     }
 
     if (selectedFriends.length > 0) {
@@ -294,7 +305,7 @@ export function Alarm() {
   const handleUpdateAlarm = async () => {
     if (!editingAlarm) return;
 
-    const hour = parseInt(newHour, 10);
+    let hour = parseInt(newHour, 10);
     const minute = parseInt(newMinute, 10);
 
     if (
@@ -306,6 +317,14 @@ export function Alarm() {
       minute > 59
     ) {
       return;
+    }
+
+    if (!is24Hour) {
+      if (newPeriod === 'PM' && hour !== 12) {
+        hour += 12;
+      } else if (newPeriod === 'AM' && hour === 12) {
+        hour = 0;
+      }
     }
 
     if (editingAlarm.isShared) {
@@ -334,17 +353,22 @@ export function Alarm() {
 
   useEffect(() => {
     if (editingAlarm) {
-      setNewHour(String(editingAlarm.hour).padStart(2, '0'));
+      const displayHour = is24Hour
+        ? editingAlarm.hour
+        : editingAlarm.hour % 12 || 12;
+      setNewHour(String(displayHour).padStart(2, '0'));
       setNewMinute(String(editingAlarm.minute).padStart(2, '0'));
       setNewLabel(editingAlarm.label);
       setNewDays(editingAlarm.days);
+      setNewPeriod(editingAlarm.hour >= 12 ? 'PM' : 'AM');
     } else {
       setNewHour('08');
       setNewMinute('00');
       setNewLabel('');
       setNewDays([]);
+      setNewPeriod('AM');
     }
-  }, [editingAlarm]);
+  }, [editingAlarm, is24Hour]);
 
   const handleShowEditDialog = (alarm: DisplayAlarm) => {
     setEditingAlarm(alarm);
@@ -678,7 +702,10 @@ export function Alarm() {
             <TextField
               value={newHour}
               onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                let val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                if (!is24Hour && parseInt(val, 10) > 12) {
+                  val = '12';
+                }
                 setNewHour(val);
               }}
               inputProps={{
@@ -706,6 +733,16 @@ export function Alarm() {
               size="small"
               placeholder="MM"
             />
+            {!is24Hour && (
+              <Select
+                value={newPeriod}
+                onChange={(e) => setNewPeriod(e.target.value)}
+                sx={{ fontSize: '1rem', ml: 1 }}
+              >
+                <MenuItem value="AM">AM</MenuItem>
+                <MenuItem value="PM">PM</MenuItem>
+              </Select>
+            )}
           </Box>
 
           {/* Label */}
@@ -833,7 +870,10 @@ export function Alarm() {
             <TextField
               value={newHour}
               onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                let val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                if (!is24Hour && parseInt(val, 10) > 12) {
+                  val = '12';
+                }
                 setNewHour(val);
               }}
               inputProps={{
@@ -861,6 +901,16 @@ export function Alarm() {
               size="small"
               placeholder="MM"
             />
+            {!is24Hour && (
+              <Select
+                value={newPeriod}
+                onChange={(e) => setNewPeriod(e.target.value)}
+                sx={{ fontSize: '1rem', ml: 1 }}
+              >
+                <MenuItem value="AM">AM</MenuItem>
+                <MenuItem value="PM">PM</MenuItem>
+              </Select>
+            )}
           </Box>
 
           {/* Label */}
