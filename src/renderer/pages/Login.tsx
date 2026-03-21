@@ -44,7 +44,7 @@ export function Login() {
       if (!user.emailVerified) {
         navigate('/verify-email');
       } else {
-        navigate('/home');
+        navigate('/alarm');
       }
     } catch (err: any) {
       switch (err.code) {

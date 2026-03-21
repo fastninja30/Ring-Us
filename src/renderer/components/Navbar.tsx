@@ -56,19 +56,6 @@ export function Navbar() {
         <ListItem disablePadding>
           <ListItemButton
             component={NavLink}
-            to="/home"
-            onClick={() => isMobile && setMobileOpen(false)}
-            sx={{ color: 'inherit' }}
-          >
-            <ListItemIcon sx={{ color: 'inherit' }}>
-              <FaHome />
-            </ListItemIcon>
-            <ListItemText primary="Home" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
             to="/alarm"
             onClick={() => isMobile && setMobileOpen(false)}
             sx={{ color: 'inherit' }}

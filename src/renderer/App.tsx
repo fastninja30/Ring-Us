@@ -70,9 +70,9 @@ export default function App() {
             <Route path="/verify-email" element={<VerifyEmail />} />
 
             {/* Protected routes */}
-            <Route path="/home" element={
+{/*             <Route path="/home" element={
               <ProtectedLayout><Home /></ProtectedLayout>
-            } />
+            } /> */}
             <Route path="/alarm" element={
               <ProtectedLayout><Alarm /></ProtectedLayout>
             } />
