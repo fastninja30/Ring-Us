@@ -56,19 +56,6 @@ export function Navbar() {
         <ListItem disablePadding>
           <ListItemButton
             component={NavLink}
-            to="/home"
-            onClick={() => isMobile && setMobileOpen(false)}
-            sx={{ color: 'inherit' }}
-          >
-            <ListItemIcon sx={{ color: 'inherit' }}>
-              <FaHome />
-            </ListItemIcon>
-            <ListItemText primary="Home" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
             to="/alarm"
             onClick={() => isMobile && setMobileOpen(false)}
             sx={{ color: 'inherit' }}
@@ -77,29 +64,6 @@ export function Navbar() {
               <IoMdAlarm />
             </ListItemIcon>
             <ListItemText primary="Alarms" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/book-list"
-            onClick={() => isMobile && setMobileOpen(false)}
-            sx={{ color: 'inherit' }}
-          >
-            <ListItemText inset primary="Book list" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/about"
-            onClick={() => isMobile && setMobileOpen(false)}
-            sx={{ color: 'inherit' }}
-          >
-            <ListItemIcon sx={{ color: 'inherit' }}>
-              <GrCircleQuestion />
-            </ListItemIcon>
-            <ListItemText primary="About" />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -142,6 +106,19 @@ export function Navbar() {
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
+          <ListItemButton
+            component={NavLink}
+            to="/about"
+            onClick={() => isMobile && setMobileOpen(false)}
+            sx={{ color: 'inherit' }}
+          >
+            <ListItemIcon sx={{ color: 'inherit' }}>
+              <GrCircleQuestion />
+            </ListItemIcon>
+            <ListItemText primary="About" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
           <ListItemButton onClick={handleSignOut} sx={{ color: 'inherit' }}>
             <ListItemIcon sx={{ color: 'inherit' }}>
               <IoMdLogOut />
@@ -157,11 +134,36 @@ export function Navbar() {
     <>
       {isMobile && (
         <IconButton
+          disableRipple
           color="inherit"
           aria-label="open drawer"
           edge="start"
           onClick={handleDrawerToggle}
-          sx={{ position: 'fixed', top: 8, left: 8, zIndex: 1300 }}
+          sx={{
+            position: 'fixed',
+            top: 12,
+            left: mobileOpen ? drawerWidth - 28 : 12,
+            zIndex: 1300,
+            width: 40,
+            height: 40,
+            p: 1,
+            border: 'none',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+            transition: theme.transitions.create('left', {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.shortest,
+            }),
+            '&:hover': {
+              backgroundColor: 'transparent',
+            },
+            '&:focus': {
+              outline: 'none',
+            },
+            '&:focus-visible': {
+              outline: 'none',
+            },
+          }}
         >
           <IoMdMenu />
         </IconButton>

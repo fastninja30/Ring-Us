@@ -501,7 +501,7 @@ export function Alarm() {
           sx={{
             backgroundColor: '#ff7300',
             '&:hover': { backgroundColor: '#e56700' },
-            width: { xs: '100%', sm: 'auto' },
+            width: { xs: '50%', sm: 'auto' },
           }}
         >
           Add Alarm
