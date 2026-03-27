@@ -98,6 +98,21 @@ export function useSharedAlarms() {
     [user],
   );
 
+  const updateSharedAlarm = useCallback(
+    async (
+      alarmId: string,
+      alarm: { hour: number; minute: number; label: string; days: number[] },
+    ) => {
+      await updateDoc(doc(db, 'sharedAlarms', alarmId), {
+        hour: alarm.hour,
+        minute: alarm.minute,
+        label: alarm.label,
+        days: alarm.days,
+      });
+    },
+    [],
+  );
+
   return {
     sharedAlarms,
     loading,
@@ -105,5 +120,6 @@ export function useSharedAlarms() {
     toggleSharedAlarm,
     deleteSharedAlarm,
     leaveSharedAlarm,
+    updateSharedAlarm,
   };
 }

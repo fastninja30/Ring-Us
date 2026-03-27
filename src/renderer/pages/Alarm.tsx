@@ -27,6 +27,8 @@ import {
   FormControlLabel,
   Checkbox,
   Switch,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   IoMdAdd,
@@ -34,6 +36,7 @@ import {
   IoMdAlarm,
   IoMdNotifications,
   IoMdPeople,
+  IoMdCreate,
 } from 'react-icons/io';
 import { AlarmData } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -120,13 +123,16 @@ export function Alarm() {
     toggleSharedAlarm,
     deleteSharedAlarm,
     leaveSharedAlarm,
+    updateSharedAlarm,
   } = useSharedAlarms();
 
   const [alarms, setAlarms] = useState<AlarmData[]>(loadAlarms);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingAlarm, setEditingAlarm] = useState<DisplayAlarm | null>(null);
   const [firingAlarm, setFiringAlarm] = useState<DisplayAlarm | null>(null);
   const [newHour, setNewHour] = useState('08');
   const [newMinute, setNewMinute] = useState('00');
+  const [newPeriod, setNewPeriod] = useState('AM');
   const [newLabel, setNewLabel] = useState('');
   const [newDays, setNewDays] = useState<number[]>([]);
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
@@ -238,7 +244,7 @@ export function Alarm() {
   }, []);
 
   const handleAddAlarm = async () => {
-    const hour = parseInt(newHour, 10);
+    let hour = parseInt(newHour, 10);
     const minute = parseInt(newMinute, 10);
 
     if (
@@ -250,6 +256,14 @@ export function Alarm() {
       minute > 59
     ) {
       return;
+    }
+
+    if (!is24Hour) {
+      if (newPeriod === 'PM' && hour !== 12) {
+        hour += 12;
+      } else if (newPeriod === 'AM' && hour === 12) {
+        hour = 0;
+      }
     }
 
     if (selectedFriends.length > 0) {
@@ -286,6 +300,78 @@ export function Alarm() {
     setNewDays([]);
     setSelectedFriends([]);
     setShowAddDialog(false);
+  };
+
+  const handleUpdateAlarm = async () => {
+    if (!editingAlarm) return;
+
+    let hour = parseInt(newHour, 10);
+    const minute = parseInt(newMinute, 10);
+
+    if (
+      Number.isNaN(hour) ||
+      Number.isNaN(minute) ||
+      hour < 0 ||
+      hour > 23 ||
+      minute < 0 ||
+      minute > 59
+    ) {
+      return;
+    }
+
+    if (!is24Hour) {
+      if (newPeriod === 'PM' && hour !== 12) {
+        hour += 12;
+      } else if (newPeriod === 'AM' && hour === 12) {
+        hour = 0;
+      }
+    }
+
+    if (editingAlarm.isShared) {
+      await updateSharedAlarm(editingAlarm.id, {
+        hour,
+        minute,
+        label: newLabel,
+        days: [...newDays],
+      });
+    } else {
+      const updatedAlarms = alarms.map((a) =>
+        a.id === editingAlarm.id
+          ? { ...a, hour, minute, label: newLabel, days: [...newDays] }
+          : a,
+      );
+      setAlarms(updatedAlarms);
+      saveAlarms(updatedAlarms);
+    }
+
+    setEditingAlarm(null);
+    setNewHour('08');
+    setNewMinute('00');
+    setNewLabel('');
+    setNewDays([]);
+  };
+
+  useEffect(() => {
+    if (editingAlarm) {
+      const displayHour = is24Hour
+        ? editingAlarm.hour
+        : editingAlarm.hour % 12 || 12;
+      setNewHour(String(displayHour).padStart(2, '0'));
+      setNewMinute(String(editingAlarm.minute).padStart(2, '0'));
+      setNewLabel(editingAlarm.label);
+      setNewDays(editingAlarm.days);
+      setNewPeriod(editingAlarm.hour >= 12 ? 'PM' : 'AM');
+    } else {
+      setNewHour('08');
+      setNewMinute('00');
+      setNewLabel('');
+      setNewDays([]);
+      setNewPeriod('AM');
+    }
+  }, [editingAlarm, is24Hour]);
+
+  const handleShowEditDialog = (alarm: DisplayAlarm) => {
+    setEditingAlarm(alarm);
   };
 
   const handleDeleteAlarm = (alarm: DisplayAlarm) => {
@@ -567,6 +653,15 @@ export function Alarm() {
                           },
                       }}
                     />
+                    {((alarm.isShared && alarm.ownerId === user?.uid) ||
+                      !alarm.isShared) && (
+                      <IconButton
+                        onClick={() => handleShowEditDialog(alarm)}
+                        sx={{ color: '#aaa' }}
+                      >
+                        <IoMdCreate />
+                      </IconButton>
+                    )}
                     <IconButton
                       onClick={() => handleDeleteAlarm(alarm)}
                       sx={{ color: '#ff4444' }}
@@ -607,7 +702,10 @@ export function Alarm() {
             <TextField
               value={newHour}
               onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                let val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                if (!is24Hour && parseInt(val, 10) > 12) {
+                  val = '12';
+                }
                 setNewHour(val);
               }}
               inputProps={{
@@ -635,6 +733,16 @@ export function Alarm() {
               size="small"
               placeholder="MM"
             />
+            {!is24Hour && (
+              <Select
+                value={newPeriod}
+                onChange={(e) => setNewPeriod(e.target.value)}
+                sx={{ fontSize: '1rem', ml: 1 }}
+              >
+                <MenuItem value="AM">AM</MenuItem>
+                <MenuItem value="PM">PM</MenuItem>
+              </Select>
+            )}
           </Box>
 
           {/* Label */}
@@ -732,6 +840,136 @@ export function Alarm() {
             }}
           >
             Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Alarm Dialog */}
+      <Dialog
+        open={editingAlarm !== null}
+        onClose={() => setEditingAlarm(null)}
+        PaperProps={{
+          sx: {
+            background: 'rgba(30, 30, 30, 0.95)',
+            minWidth: { xs: '90%', sm: 350 },
+          },
+        }}
+      >
+        <DialogTitle>Edit Alarm</DialogTitle>
+        <DialogContent>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              my: 2,
+              flexWrap: 'wrap',
+            }}
+          >
+            <TextField
+              value={newHour}
+              onChange={(e) => {
+                let val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                if (!is24Hour && parseInt(val, 10) > 12) {
+                  val = '12';
+                }
+                setNewHour(val);
+              }}
+              inputProps={{
+                style: { textAlign: 'center', fontSize: '2rem', width: '50px' },
+                maxLength: 2,
+              }}
+              variant="outlined"
+              size="small"
+              placeholder="HH"
+            />
+            <Typography variant="h3" sx={{ fontWeight: 300 }}>
+              :
+            </Typography>
+            <TextField
+              value={newMinute}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                setNewMinute(val);
+              }}
+              inputProps={{
+                style: { textAlign: 'center', fontSize: '2rem', width: '50px' },
+                maxLength: 2,
+              }}
+              variant="outlined"
+              size="small"
+              placeholder="MM"
+            />
+            {!is24Hour && (
+              <Select
+                value={newPeriod}
+                onChange={(e) => setNewPeriod(e.target.value)}
+                sx={{ fontSize: '1rem', ml: 1 }}
+              >
+                <MenuItem value="AM">AM</MenuItem>
+                <MenuItem value="PM">PM</MenuItem>
+              </Select>
+            )}
+          </Box>
+
+          {/* Label */}
+          <TextField
+            fullWidth
+            label="Label (optional)"
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+
+          {/* Day selector */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Repeat (leave empty for one-time alarm)
+          </Typography>
+          <FormGroup row>
+            {DAY_LABELS.map((label, index) => (
+              <FormControlLabel
+                key={label}
+                control={
+                  <Checkbox
+                    checked={newDays.includes(index)}
+                    onChange={() => handleToggleDay(index)}
+                    sx={{
+                      color: '#666',
+                      '&.Mui-checked': { color: '#ff7300' },
+                      padding: '4px',
+                    }}
+                    size="small"
+                  />
+                }
+                label={label}
+              />
+            ))}
+          </FormGroup>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 0 },
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
+          <Button
+            onClick={() => setEditingAlarm(null)}
+            sx={{ color: 'text.secondary', width: { xs: '100%', sm: 'auto' } }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUpdateAlarm}
+            variant="contained"
+            sx={{
+              backgroundColor: '#ff7300',
+              '&:hover': { backgroundColor: '#e56700' },
+              width: { xs: '100%', sm: 'auto' },
+            }}
+          >
+            Save Changes
           </Button>
         </DialogActions>
       </Dialog>
