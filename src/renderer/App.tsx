@@ -79,14 +79,6 @@ export default function App() {
                     }
                   />
                   <Route
-                    path="/clock"
-                    element={
-                      <ProtectedLayout>
-                        <Clock />
-                      </ProtectedLayout>
-                    }
-                  />
-                  <Route
                     path="/book-list"
                     element={
                       <ProtectedLayout>

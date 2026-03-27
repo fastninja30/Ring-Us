@@ -69,19 +69,6 @@ export function Navbar() {
         <ListItem disablePadding>
           <ListItemButton
             component={NavLink}
-            to="/clock"
-            onClick={() => isMobile && setMobileOpen(false)}
-            sx={{ color: 'inherit' }}
-          >
-            <ListItemIcon sx={{ color: 'inherit' }}>
-              <FaRegClock />
-            </ListItemIcon>
-            <ListItemText primary="Clock" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
             to="/friends"
             onClick={() => isMobile && setMobileOpen(false)}
             sx={{ color: 'inherit' }}
