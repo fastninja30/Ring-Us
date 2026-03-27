@@ -12,7 +12,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { FaHome, FaRegClock, FaUserFriends } from 'react-icons/fa';
@@ -32,6 +32,13 @@ export function Navbar() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // Drag state for mobile swipe
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+  const [drawerTranslateX, setDrawerTranslateX] = useState(0);
+  const drawerRef = useRef<HTMLDivElement>(null);
+
   const toggleDrawer = (open: boolean) => {
     setDrawerOpen(open);
   };
@@ -44,6 +51,99 @@ export function Navbar() {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  // Touch/Mouse event handlers for drag functionality
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setCurrentX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !isMobile) return;
+    e.preventDefault();
+    const currentX = e.touches[0].clientX;
+    const deltaX = currentX - startX;
+
+    // Only allow dragging from left edge or when drawer is open
+    if (startX > 50 && !mobileOpen) return;
+
+    setCurrentX(currentX);
+    // Clamp the translation between -drawerWidth and 0
+    const newTranslateX = Math.max(-drawerWidth, Math.min(0, deltaX));
+    setDrawerTranslateX(newTranslateX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging || !isMobile) return;
+    setIsDragging(false);
+
+    const deltaX = currentX - startX;
+    const threshold = drawerWidth * 0.3; // 30% of drawer width
+
+    if (Math.abs(deltaX) > threshold) {
+      // If dragged more than threshold, open/close drawer
+      if (deltaX > 0 && !mobileOpen) {
+        setMobileOpen(true);
+      } else if (deltaX < 0 && mobileOpen) {
+        setMobileOpen(false);
+      }
+    }
+
+    setDrawerTranslateX(0);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!isMobile) return;
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setCurrentX(e.clientX);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const currentX = e.clientX;
+      const deltaX = currentX - startX;
+
+      // Only allow dragging from left edge or when drawer is open
+      if (startX > 50 && !mobileOpen) return;
+
+      setCurrentX(currentX);
+      // Clamp the translation between -drawerWidth and 0
+      const newTranslateX = Math.max(-drawerWidth, Math.min(0, deltaX));
+      setDrawerTranslateX(newTranslateX);
+    };
+
+    const handleMouseUp = () => {
+      if (!isDragging) return;
+      setIsDragging(false);
+
+      const deltaX = currentX - startX;
+      const threshold = drawerWidth * 0.3;
+
+      if (Math.abs(deltaX) > threshold) {
+        if (deltaX > 0 && !mobileOpen) {
+          setMobileOpen(true);
+        } else if (deltaX < 0 && mobileOpen) {
+          setMobileOpen(false);
+        }
+      }
+
+      setDrawerTranslateX(0);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  // Update drawer translate when mobileOpen changes
+  useEffect(() => {
+    if (!isMobile) return;
+    setDrawerTranslateX(0);
+  }, [mobileOpen, isMobile]);
 
   const drawerContent = (
     <Box sx={{ overflow: 'auto' }}>
@@ -133,6 +233,24 @@ export function Navbar() {
   return (
     <>
       {isMobile && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            zIndex: 1200,
+            backgroundColor: isDragging ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+            transition: isDragging ? 'none' : 'background-color 0.3s ease',
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+        />
+      )}
+      {isMobile && (
         <IconButton
           disableRipple
           color="inherit"
@@ -169,6 +287,7 @@ export function Navbar() {
         </IconButton>
       )}
       <Drawer
+        ref={drawerRef}
         variant={isMobile ? 'temporary' : 'permanent'}
         open={isMobile ? mobileOpen : true}
         onClose={handleDrawerToggle}
@@ -183,6 +302,11 @@ export function Navbar() {
             color: '#F4F3F2',
             position: isMobile ? 'relative' : 'fixed',
             height: isMobile ? '100%' : '100vh',
+            transform: isMobile ? `translateX(${drawerTranslateX}px)` : 'none',
+            transition: isDragging ? 'none' : theme.transitions.create('transform', {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.shortest,
+            }),
           },
         }}
       >
