@@ -1,4 +1,10 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  MemoryRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from 'react-router-dom';
+import { useEffect } from 'react';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
@@ -41,12 +47,31 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function NavigationHandler() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const removeListener = window.electron.ipcRenderer.on('navigate', (path) => {
+      if (typeof path === 'string') {
+        navigate(path);
+      }
+    });
+
+    return () => {
+      removeListener();
+    };
+  }, [navigate]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <FriendsProvider>
           <Router>
+            <NavigationHandler />
             <CssBaseline />
             <Box sx={{ display: 'flex', minHeight: '100vh' }}>
               <Navbar />
