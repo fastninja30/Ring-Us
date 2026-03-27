@@ -15,7 +15,7 @@ import {
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { FaHome, FaRegClock, FaUserFriends } from 'react-icons/fa';
+import { FaUserFriends } from 'react-icons/fa';
 import { FaGear } from 'react-icons/fa6';
 import { IoMdAlarm, IoMdLogOut, IoMdMenu } from 'react-icons/io';
 import { GrCircleQuestion } from 'react-icons/gr';

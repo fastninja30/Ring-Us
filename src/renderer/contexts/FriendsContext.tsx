@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from 'react';
 import {
   doc,
   getDoc,
@@ -22,11 +29,11 @@ import { UserProfile, FriendRequest } from '../types';
 const FRIEND_CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function generateFriendCode(): string {
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += FRIEND_CODE_CHARS.charAt(Math.floor(Math.random() * FRIEND_CODE_CHARS.length));
-  }
-  return code;
+  return Array.from({ length: 6 }, () =>
+    FRIEND_CODE_CHARS.charAt(
+      Math.floor(Math.random() * FRIEND_CODE_CHARS.length),
+    ),
+  ).join('');
 }
 
 interface FriendInfo {
@@ -85,12 +92,18 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
         const profileSnap = await getDoc(profileRef);
 
         if (profileSnap.exists()) {
-          setUserProfile({ id: user.uid, ...profileSnap.data() } as unknown as UserProfile);
+          setUserProfile({
+            id: user.uid,
+            ...profileSnap.data(),
+          } as unknown as UserProfile);
         } else {
           // Auto-create profile for existing users
           let friendCode = generateFriendCode();
           // Check uniqueness
-          const codeQuery = query(collection(db, 'users'), where('friendCode', '==', friendCode));
+          const codeQuery = query(
+            collection(db, 'users'),
+            where('friendCode', '==', friendCode),
+          );
           const codeSnap = await getDocs(codeQuery);
           if (!codeSnap.empty) {
             friendCode = generateFriendCode(); // retry once
@@ -105,7 +118,10 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
             createdAt: serverTimestamp() as any,
           };
           await setDoc(profileRef, newProfile);
-          setUserProfile({ ...newProfile, createdAt: new Date() } as unknown as UserProfile);
+          setUserProfile({
+            ...newProfile,
+            createdAt: new Date(),
+          } as unknown as UserProfile);
         }
       } catch (err) {
         console.error('Failed to load user profile:', err);
@@ -114,12 +130,12 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    loadProfile();
+    loadProfile().catch(console.error);
   }, [user]);
 
   // Listen to profile changes (friends array updates)
   useEffect(() => {
-    if (!user) return;
+    if (!user) return () => {};
 
     const unsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
       if (snapshot.exists()) {
@@ -127,7 +143,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, [user]);
 
   // Load friends details when profile.friends changes
@@ -156,7 +172,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       setFriends(friendInfos);
     };
 
-    loadFriends();
+    loadFriends().catch(console.error);
   }, [userProfile?.friends]);
 
   // Listen to incoming pending friend requests
@@ -177,7 +193,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       setPendingRequests(requests);
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, [user]);
 
   // Listen to outgoing pending friend requests
@@ -198,7 +214,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       setOutgoingRequests(requests);
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, [user]);
 
   const sendFriendRequest = useCallback(async (code: string): Promise<string> => {
