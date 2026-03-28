@@ -9,7 +9,6 @@ import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
 import './App.css';
-import React from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { FriendsProvider } from './contexts/FriendsContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -42,7 +41,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
       <Navbar />
-      <div className="main-content"> {children} </div>
+      <div className="main-content">{children}</div>
     </ProtectedRoute>
   );
 }
@@ -92,9 +91,6 @@ export default function App() {
                   <Route path="/verify-email" element={<VerifyEmail />} />
 
                   {/* Protected routes */}
-                  {/*             <Route path="/home" element={
-              <ProtectedLayout><Home /></ProtectedLayout>
-            } /> */}
                   <Route
                     path="/alarm"
                     element={
