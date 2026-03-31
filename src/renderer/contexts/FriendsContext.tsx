@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
   ReactNode,
 } from 'react';
 import {
@@ -147,6 +148,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   // Load friends details when profile.friends changes
+  // Load friends details when profile.friends changes
   useEffect(() => {
     if (!userProfile?.friends?.length) {
       setFriends([]);
@@ -154,21 +156,31 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     }
 
     const loadFriends = async () => {
-      const friendInfos: FriendInfo[] = [];
-      for (const friendUid of userProfile.friends) {
+      // Map over the array to create an array of Promises
+      const friendPromises = userProfile.friends.map(async (friendUid) => {
         try {
           const friendDoc = await getDoc(doc(db, 'users', friendUid));
           if (friendDoc.exists()) {
             const data = friendDoc.data();
-            friendInfos.push({
+            return {
               uid: friendUid,
               displayName: data.displayName || 'Unknown',
-            });
+            } as FriendInfo;
           }
+          return null; // Return null if doc doesn't exist
         } catch {
-          // Skip friends whose profiles can't be loaded
+          return null; // Return null if the fetch fails
         }
-      }
+      });
+
+      // Await all promises concurrently
+      const results = await Promise.all(friendPromises);
+
+      // Filter out the nulls to get the final FriendInfo[] array
+      const friendInfos = results.filter(
+        (info): info is FriendInfo => info !== null,
+      );
+
       setFriends(friendInfos);
     };
 
@@ -177,7 +189,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
 
   // Listen to incoming pending friend requests
   useEffect(() => {
-    if (!user) return;
+    if (!user) return () => {};
 
     const q = query(
       collection(db, 'friendRequests'),
@@ -198,7 +210,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
 
   // Listen to outgoing pending friend requests
   useEffect(() => {
-    if (!user) return;
+    if (!user) return () => {};
 
     const q = query(
       collection(db, 'friendRequests'),
@@ -217,127 +229,160 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, [user]);
 
-  const sendFriendRequest = useCallback(async (code: string): Promise<string> => {
-    if (!user || !userProfile) throw new Error('Not authenticated');
+  const acceptFriendRequest = useCallback(
+    async (requestId: string): Promise<void> => {
+      if (!user) throw new Error('Not authenticated');
 
-    const trimmedCode = code.trim().toUpperCase();
+      const requestRef = doc(db, 'friendRequests', requestId);
+      const requestSnap = await getDoc(requestRef);
+      if (!requestSnap.exists()) throw new Error('Request not found.');
 
-    // Look up user by friend code
-    const q = query(collection(db, 'users'), where('friendCode', '==', trimmedCode));
-    const snap = await getDocs(q);
+      const requestData = requestSnap.data();
+      const otherUid =
+        requestData.fromUid === user.uid
+          ? requestData.toUid
+          : requestData.fromUid;
 
-    if (snap.empty) {
-      throw new Error('No user found with that friend code.');
-    }
+      const batch = writeBatch(db);
 
-    const targetDoc = snap.docs[0];
-    const targetUid = targetDoc.id;
-    const targetData = targetDoc.data();
+      // Update request status
+      batch.update(requestRef, { status: 'accepted' });
 
-    if (targetUid === user.uid) {
-      throw new Error("You can't add yourself as a friend.");
-    }
+      // Add each user to the other's friends array
+      batch.update(doc(db, 'users', user.uid), {
+        friends: arrayUnion(otherUid),
+      });
+      batch.update(doc(db, 'users', otherUid), {
+        friends: arrayUnion(user.uid),
+      });
 
-    // Check if already friends
-    if (userProfile.friends?.includes(targetUid)) {
-      throw new Error('You are already friends with this user.');
-    }
+      await batch.commit();
+    },
+    [user],
+  );
 
-    // Check for existing pending request
-    const existingQuery = query(
-      collection(db, 'friendRequests'),
-      where('fromUid', '==', user.uid),
-      where('toUid', '==', targetUid),
-      where('status', '==', 'pending'),
-    );
-    const existingSnap = await getDocs(existingQuery);
-    if (!existingSnap.empty) {
-      throw new Error('Friend request already sent.');
-    }
+  const declineFriendRequest = useCallback(
+    async (requestId: string): Promise<void> => {
+      await updateDoc(doc(db, 'friendRequests', requestId), {
+        status: 'declined',
+      });
+    },
+    [],
+  );
 
-    // Check for incoming request from that user (auto-accept)
-    const reverseQuery = query(
-      collection(db, 'friendRequests'),
-      where('fromUid', '==', targetUid),
-      where('toUid', '==', user.uid),
-      where('status', '==', 'pending'),
-    );
-    const reverseSnap = await getDocs(reverseQuery);
-    if (!reverseSnap.empty) {
-      // Auto-accept the existing incoming request
-      await acceptFriendRequest(reverseSnap.docs[0].id);
+  const removeFriend = useCallback(
+    async (friendUid: string): Promise<void> => {
+      if (!user) throw new Error('Not authenticated');
+
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'users', user.uid), {
+        friends: arrayRemove(friendUid),
+      });
+      batch.update(doc(db, 'users', friendUid), {
+        friends: arrayRemove(user.uid),
+      });
+      await batch.commit();
+    },
+    [user],
+  );
+
+  const sendFriendRequest = useCallback(
+    async (code: string): Promise<string> => {
+      if (!user || !userProfile) throw new Error('Not authenticated');
+
+      const trimmedCode = code.trim().toUpperCase();
+
+      // Look up user by friend code
+      const q = query(
+        collection(db, 'users'),
+        where('friendCode', '==', trimmedCode),
+      );
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        throw new Error('No user found with that friend code.');
+      }
+
+      const targetDoc = snap.docs[0];
+      const targetUid = targetDoc.id;
+      const targetData = targetDoc.data();
+
+      if (targetUid === user.uid) {
+        throw new Error("You can't add yourself as a friend.");
+      }
+
+      // Check if already friends
+      if (userProfile.friends?.includes(targetUid)) {
+        throw new Error('You are already friends with this user.');
+      }
+
+      // Check for existing pending request
+      const existingQuery = query(
+        collection(db, 'friendRequests'),
+        where('fromUid', '==', user.uid),
+        where('toUid', '==', targetUid),
+        where('status', '==', 'pending'),
+      );
+      const existingSnap = await getDocs(existingQuery);
+      if (!existingSnap.empty) {
+        throw new Error('Friend request already sent.');
+      }
+
+      // Check for incoming request from that user (auto-accept)
+      const reverseQuery = query(
+        collection(db, 'friendRequests'),
+        where('fromUid', '==', targetUid),
+        where('toUid', '==', user.uid),
+        where('status', '==', 'pending'),
+      );
+      const reverseSnap = await getDocs(reverseQuery);
+      if (!reverseSnap.empty) {
+        // Auto-accept the existing incoming request
+        await acceptFriendRequest(reverseSnap.docs[0].id);
+        return targetData.displayName || 'User';
+      }
+
+      await addDoc(collection(db, 'friendRequests'), {
+        fromUid: user.uid,
+        toUid: targetUid,
+        fromName: user.displayName || '',
+        status: 'pending',
+        createdAt: serverTimestamp(),
+      });
+
       return targetData.displayName || 'User';
-    }
+    },
+    [user, userProfile, acceptFriendRequest],
+  );
 
-    await addDoc(collection(db, 'friendRequests'), {
-      fromUid: user.uid,
-      toUid: targetUid,
-      fromName: user.displayName || '',
-      status: 'pending',
-      createdAt: serverTimestamp(),
-    });
-
-    return targetData.displayName || 'User';
-  }, [user, userProfile]);
-
-  const acceptFriendRequest = useCallback(async (requestId: string): Promise<void> => {
-    if (!user) throw new Error('Not authenticated');
-
-    const requestRef = doc(db, 'friendRequests', requestId);
-    const requestSnap = await getDoc(requestRef);
-    if (!requestSnap.exists()) throw new Error('Request not found.');
-
-    const requestData = requestSnap.data();
-    const otherUid = requestData.fromUid === user.uid ? requestData.toUid : requestData.fromUid;
-
-    const batch = writeBatch(db);
-
-    // Update request status
-    batch.update(requestRef, { status: 'accepted' });
-
-    // Add each user to the other's friends array
-    batch.update(doc(db, 'users', user.uid), {
-      friends: arrayUnion(otherUid),
-    });
-    batch.update(doc(db, 'users', otherUid), {
-      friends: arrayUnion(user.uid),
-    });
-
-    await batch.commit();
-  }, [user]);
-
-  const declineFriendRequest = useCallback(async (requestId: string): Promise<void> => {
-    await updateDoc(doc(db, 'friendRequests', requestId), { status: 'declined' });
-  }, []);
-
-  const removeFriend = useCallback(async (friendUid: string): Promise<void> => {
-    if (!user) throw new Error('Not authenticated');
-
-    const batch = writeBatch(db);
-    batch.update(doc(db, 'users', user.uid), {
-      friends: arrayRemove(friendUid),
-    });
-    batch.update(doc(db, 'users', friendUid), {
-      friends: arrayRemove(user.uid),
-    });
-    await batch.commit();
-  }, [user]);
+  const contextValue = useMemo(
+    () => ({
+      userProfile,
+      friends,
+      pendingRequests,
+      outgoingRequests,
+      pendingRequestCount: pendingRequests.length,
+      loading,
+      sendFriendRequest,
+      acceptFriendRequest,
+      declineFriendRequest,
+      removeFriend,
+    }),
+    [
+      userProfile,
+      friends,
+      pendingRequests,
+      outgoingRequests,
+      loading,
+      sendFriendRequest,
+      acceptFriendRequest,
+      declineFriendRequest,
+      removeFriend,
+    ],
+  );
 
   return (
-    <FriendsContext.Provider
-      value={{
-        userProfile,
-        friends,
-        pendingRequests,
-        outgoingRequests,
-        pendingRequestCount: pendingRequests.length,
-        loading,
-        sendFriendRequest,
-        acceptFriendRequest,
-        declineFriendRequest,
-        removeFriend,
-      }}
-    >
+    <FriendsContext.Provider value={contextValue}>
       {children}
     </FriendsContext.Provider>
   );
