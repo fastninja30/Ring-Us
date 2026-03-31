@@ -73,7 +73,6 @@ export default function App() {
             <NavigationHandler />
             <CssBaseline />
             <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-              <Navbar />
               <Box
                 component="main"
                 sx={{
