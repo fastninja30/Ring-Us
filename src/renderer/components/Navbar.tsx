@@ -220,24 +220,24 @@ export function Navbar() {
   return (
     <>
       {isMobile && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            zIndex: 1200,
-            backgroundColor: isDragging ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-            transition: isDragging ? 'none' : 'background-color 0.3s ease',
-          }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-        />
-      )}
-      {isMobile && (
+      //   <Box
+      //     sx={{
+      //       position: 'fixed',
+      //       top: 0,
+      //       left: 0,
+      //       width: '100vw',
+      //       height: '100vh',
+      //       zIndex: 1200,
+      //       backgroundColor: isDragging ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+      //       transition: isDragging ? 'none' : 'background-color 0.3s ease',
+      //     }}
+      //     onTouchStart={handleTouchStart}
+      //     onTouchMove={handleTouchMove}
+      //     onTouchEnd={handleTouchEnd}
+      //     onMouseDown={handleMouseDown}
+      //   />
+      // )}
+      // {isMobile && (
         <IconButton
           disableRipple
           color="inherit"
