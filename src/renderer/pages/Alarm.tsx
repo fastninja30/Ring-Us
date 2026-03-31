@@ -752,6 +752,9 @@ export function Alarm() {
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             sx={{ mb: 2 }}
+            inputProps={{ maxLength: 40 }}
+            helperText={`${newLabel.length}/40`}
+            error={newLabel.length > 40}
           />
 
           {/* Day selector */}
@@ -920,6 +923,9 @@ export function Alarm() {
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             sx={{ mb: 2 }}
+            inputProps={{ maxLength: 40 }}
+            helperText={`${newLabel.length}/40`}
+            error={newLabel.length > 40}
           />
 
           {/* Day selector */}
