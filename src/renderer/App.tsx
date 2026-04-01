@@ -88,11 +88,14 @@ function NavigationHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const removeListener = window.electron.ipcRenderer.on('navigate', (path) => {
-      if (typeof path === 'string') {
-        navigate(path);
-      }
-    });
+    const removeListener = window.electron.ipcRenderer.on(
+      'navigate',
+      (path) => {
+        if (typeof path === 'string') {
+          navigate(path);
+        }
+      },
+    );
 
     return () => {
       removeListener();

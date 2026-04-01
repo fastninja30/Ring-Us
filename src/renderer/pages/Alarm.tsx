@@ -20,7 +20,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   Divider,
   Chip,
   FormGroup,
@@ -536,6 +535,8 @@ export function Alarm() {
                   }}
                 >
                   <ListItemText
+                    primaryTypographyProps={{ component: 'div' }}
+                    secondaryTypographyProps={{ component: 'div' }}
                     primary={
                       <Typography
                         variant="h4"
@@ -549,7 +550,7 @@ export function Alarm() {
                       </Typography>
                     }
                     secondary={
-                      <Box sx={{ mt: 0.5 }}>
+                      <Box>
                         {alarm.label && (
                           <Typography
                             variant="body2"
@@ -629,15 +630,14 @@ export function Alarm() {
                       </Box>
                     }
                   />
-                  <ListItemSecondaryAction
+                  <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
                       gap: 1,
-                      position: { xs: 'relative', sm: 'absolute' },
-                      right: { xs: 0, sm: 'unset' },
-                      top: { xs: 'unset', sm: 'unset' },
                       mt: { xs: 1, sm: 0 },
+                      ml: { sm: 'auto' },
+                      flexShrink: 0,
                     }}
                   >
                     <Switch
@@ -668,7 +668,7 @@ export function Alarm() {
                     >
                       <IoMdTrash />
                     </IconButton>
-                  </ListItemSecondaryAction>
+                  </Box>
                 </ListItem>
               </Box>
             ))}

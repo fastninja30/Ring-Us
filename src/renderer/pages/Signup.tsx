@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Navigate, Link as RouterLink } from 'react-router-dom';
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -34,9 +34,11 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Signup() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -126,6 +128,25 @@ export function Signup() {
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
+
+  if (authLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <CircularProgress sx={{ color: '#ff7300' }} />
+      </Box>
+    );
+  }
+
+  if (user && user.emailVerified) {
+    return <Navigate to="/alarm" replace />;
+  }
 
   return (
     <Box
