@@ -10,7 +10,9 @@ import {
   Toolbar,
   Typography,
   useMediaQuery,
-  useTheme,
+  useTheme as useMuiTheme,
+  Switch,
+  Divider,
 } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -19,8 +21,10 @@ import { FaUserFriends } from 'react-icons/fa';
 import { FaGear } from 'react-icons/fa6';
 import { IoMdAlarm, IoMdLogOut, IoMdMenu } from 'react-icons/io';
 import { GrCircleQuestion } from 'react-icons/gr';
+import { FiSun, FiMoon } from 'react-icons/fi';
 import { auth } from '../firebaseConfig';
 import { useFriends } from '../contexts/FriendsContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const drawerWidth = 240;
 
@@ -28,8 +32,9 @@ export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { pendingRequestCount } = useFriends();
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { mode, toggleTheme } = useTheme();
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Drag state for mobile swipe
@@ -214,6 +219,48 @@ export function Navbar() {
           </ListItemButton>
         </ListItem>
       </List>
+
+      {/* Theme Toggle - Separate from main navigation */}
+      <Box sx={{ p: 2, borderTop: `1px solid ${muiTheme.palette.divider}` }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            p: 1,
+            borderRadius: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton
+              size="small"
+              sx={{ color: 'inherit', p: 0.5 }}
+            >
+              {mode === 'dark' ? <FiSun /> : <FiMoon />}
+            </IconButton>
+            <Typography variant="body2" sx={{ color: 'inherit' }}>
+              {mode === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </Typography>
+          </Box>
+          <Switch
+            checked={mode === 'dark'}
+            onChange={toggleTheme}
+            size="small"
+            sx={{
+              '& .MuiSwitch-switchBase.Mui-checked': {
+                color: '#ff7300',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 115, 0, 0.08)',
+                },
+              },
+              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: '#ff7300',
+              },
+            }}
+          />
+        </Box>
+      </Box>
     </Box>
   );
 
@@ -255,9 +302,9 @@ export function Navbar() {
             border: 'none',
             backgroundColor: 'transparent',
             boxShadow: 'none',
-            transition: theme.transitions.create('left', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.shortest,
+            transition: muiTheme.transitions.create('left', {
+              easing: muiTheme.transitions.easing.sharp,
+              duration: muiTheme.transitions.duration.shortest,
             }),
             '&:hover': {
               backgroundColor: 'transparent',
@@ -290,10 +337,16 @@ export function Navbar() {
             position: isMobile ? 'relative' : 'fixed',
             height: isMobile ? '100%' : '100vh',
             transform: isMobile ? `translateX(${drawerTranslateX}px)` : 'none',
-            transition: isDragging ? 'none' : theme.transitions.create('transform', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.shortest,
+            transition: isDragging ? 'none' : muiTheme.transitions.create('transform', {
+              easing: muiTheme.transitions.easing.sharp,
+              duration: muiTheme.transitions.duration.shortest,
             }),
+            // Override the theme toggle background to be semi-transparent
+            '& > .MuiBox-root > .MuiBox-root': {
+              backgroundColor: mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.1)',
+            },
           },
         }}
       >
