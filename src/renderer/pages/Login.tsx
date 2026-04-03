@@ -41,9 +41,8 @@ export function Login() {
         email,
         password,
       );
-      const { user } = userCredential;
 
-      if (!user.emailVerified) {
+      if (!userCredential.user.emailVerified) {
         navigate('/verify-email');
       } else {
         navigate('/alarm');

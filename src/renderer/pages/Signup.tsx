@@ -69,10 +69,10 @@ export function Signup() {
         email,
         password,
       );
-      const { user } = userCredential;
+      const newUser = userCredential.user;
 
-      await updateProfile(user, { displayName: name });
-      await sendEmailVerification(user);
+      await updateProfile(newUser, { displayName: name });
+      await sendEmailVerification(newUser);
 
       // Create Firestore user profile with friend code
       const friendCodeChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -96,8 +96,8 @@ export function Signup() {
           );
         }
       }
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
+      await setDoc(doc(db, 'users', newUser.uid), {
+        uid: newUser.uid,
         displayName: name,
         email,
         friendCode,

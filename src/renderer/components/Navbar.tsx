@@ -12,7 +12,6 @@ import {
   useMediaQuery,
   useTheme as useMuiTheme,
   Switch,
-  Divider,
 } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -233,10 +232,7 @@ export function Navbar() {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              size="small"
-              sx={{ color: 'inherit', p: 0.5 }}
-            >
+            <IconButton size="small" sx={{ color: 'inherit', p: 0.5 }}>
               {mode === 'dark' ? <FiSun /> : <FiMoon />}
             </IconButton>
             <Typography variant="body2" sx={{ color: 'inherit' }}>
@@ -267,24 +263,24 @@ export function Navbar() {
   return (
     <>
       {isMobile && (
-      //   <Box
-      //     sx={{
-      //       position: 'fixed',
-      //       top: 0,
-      //       left: 0,
-      //       width: '100vw',
-      //       height: '100vh',
-      //       zIndex: 1200,
-      //       backgroundColor: isDragging ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-      //       transition: isDragging ? 'none' : 'background-color 0.3s ease',
-      //     }}
-      //     onTouchStart={handleTouchStart}
-      //     onTouchMove={handleTouchMove}
-      //     onTouchEnd={handleTouchEnd}
-      //     onMouseDown={handleMouseDown}
-      //   />
-      // )}
-      // {isMobile && (
+        //   <Box
+        //     sx={{
+        //       position: 'fixed',
+        //       top: 0,
+        //       left: 0,
+        //       width: '100vw',
+        //       height: '100vh',
+        //       zIndex: 1200,
+        //       backgroundColor: isDragging ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+        //       transition: isDragging ? 'none' : 'background-color 0.3s ease',
+        //     }}
+        //     onTouchStart={handleTouchStart}
+        //     onTouchMove={handleTouchMove}
+        //     onTouchEnd={handleTouchEnd}
+        //     onMouseDown={handleMouseDown}
+        //   />
+        // )}
+        // {isMobile && (
         <IconButton
           disableRipple
           color="inherit"
@@ -337,15 +333,18 @@ export function Navbar() {
             position: isMobile ? 'relative' : 'fixed',
             height: isMobile ? '100%' : '100vh',
             transform: isMobile ? `translateX(${drawerTranslateX}px)` : 'none',
-            transition: isDragging ? 'none' : muiTheme.transitions.create('transform', {
-              easing: muiTheme.transitions.easing.sharp,
-              duration: muiTheme.transitions.duration.shortest,
-            }),
+            transition: isDragging
+              ? 'none'
+              : muiTheme.transitions.create('transform', {
+                  easing: muiTheme.transitions.easing.sharp,
+                  duration: muiTheme.transitions.duration.shortest,
+                }),
             // Override the theme toggle background to be semi-transparent
             '& > .MuiBox-root > .MuiBox-root': {
-              backgroundColor: mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.1)'
-                : 'rgba(0, 0, 0, 0.1)',
+              backgroundColor:
+                mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.1)'
+                  : 'rgba(0, 0, 0, 0.1)',
             },
           },
         }}

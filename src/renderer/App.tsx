@@ -4,14 +4,17 @@ import {
   Route,
   useNavigate,
 } from 'react-router-dom';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import '@fontsource/open-sans';
 import '@fontsource/open-sans/800.css';
 import './App.css';
 import { AuthProvider } from './contexts/AuthContext';
 import { FriendsProvider } from './contexts/FriendsContext';
-import { ThemeProvider as CustomThemeProvider, useTheme } from './contexts/ThemeContext';
+import {
+  ThemeProvider as CustomThemeProvider,
+  useTheme,
+} from './contexts/ThemeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Navbar } from './components/Navbar';
 import { BookList } from './pages/BookList';

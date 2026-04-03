@@ -25,7 +25,7 @@ export function useSharedAlarms() {
     if (!user) {
       setSharedAlarms([]);
       setLoading(false);
-      return;
+      if (!user) return () => {};
     }
 
     const q = query(
@@ -79,12 +79,9 @@ export function useSharedAlarms() {
     [],
   );
 
-  const deleteSharedAlarm = useCallback(
-    async (alarmId: string) => {
-      await deleteDoc(doc(db, 'sharedAlarms', alarmId));
-    },
-    [],
-  );
+  const deleteSharedAlarm = useCallback(async (alarmId: string) => {
+    await deleteDoc(doc(db, 'sharedAlarms', alarmId));
+  }, []);
 
   const leaveSharedAlarm = useCallback(
     async (alarmId: string) => {
