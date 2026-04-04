@@ -28,6 +28,8 @@ import {
   Switch,
   Select,
   MenuItem,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import {
   IoMdAdd,
@@ -138,6 +140,7 @@ export function Alarm() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const firedAlarmsRef = useRef<Set<string>>(new Set());
   const audioContextRef = useRef<AudioContext | null>(null);
+  const theme = useTheme();
 
   const is24Hour = localStorage.getItem('settings-is24Hour') === 'true';
 
@@ -498,8 +501,6 @@ export function Alarm() {
           startIcon={<IoMdAdd />}
           onClick={() => setShowAddDialog(true)}
           sx={{
-            backgroundColor: '#ff7300',
-            '&:hover': { backgroundColor: '#e56700' },
             width: { xs: '50%', sm: 'auto' },
           }}
         >
@@ -513,7 +514,8 @@ export function Alarm() {
           sx={{
             p: 4,
             textAlign: 'center',
-            background: 'rgba(30, 30, 30, 0.7)',
+            backgroundColor: alpha(theme.palette.background.paper, 0.8),
+            backdropFilter: 'blur(8px)',
           }}
         >
           <IoMdAlarm style={{ fontSize: 48, color: '#666', marginBottom: 8 }} />
@@ -522,7 +524,12 @@ export function Alarm() {
           </Typography>
         </Paper>
       ) : (
-        <Paper sx={{ background: 'rgba(30, 30, 30, 0.7)' }}>
+        <Paper
+          sx={{
+            backgroundColor: alpha(theme.palette.background.paper, 0.8),
+            backdropFilter: 'blur(8px)',
+          }}
+        >
           <List>
             {allAlarms.map((alarm, index) => (
               <Box key={`${alarm.isShared ? 'shared' : 'local'}-${alarm.id}`}>
@@ -542,7 +549,7 @@ export function Alarm() {
                         variant="h4"
                         sx={{
                           fontWeight: 300,
-                          color: alarm.enabled ? '#F4F3F2' : '#666',
+                          color: alarm.enabled ? 'text.primary' : 'text.disabled',
                           fontSize: { xs: '1.5rem', sm: '2rem' },
                         }}
                       >
@@ -555,7 +562,7 @@ export function Alarm() {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: alarm.enabled ? 'text.secondary' : '#555',
+                              color: alarm.enabled ? 'text.secondary' : 'text.disabled',
                             }}
                           >
                             {alarm.label}
@@ -565,7 +572,7 @@ export function Alarm() {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: alarm.enabled ? '#ff7300' : '#555',
+                              color: alarm.enabled ? 'primary.main' : 'text.disabled',
                               fontSize: '0.75rem',
                             }}
                           >
@@ -590,8 +597,8 @@ export function Alarm() {
                               sx={{
                                 fontSize: '0.7rem',
                                 height: 20,
-                                color: alarm.enabled ? '#ff7300' : '#555',
-                                borderColor: alarm.enabled ? '#ff7300' : '#555',
+                                color: alarm.enabled ? 'primary.main' : 'text.disabled',
+                                borderColor: alarm.enabled ? 'primary.main' : 'text.disabled',
                               }}
                               variant="outlined"
                             />
@@ -603,8 +610,8 @@ export function Alarm() {
                               sx={{
                                 fontSize: '0.7rem',
                                 height: 20,
-                                color: alarm.enabled ? '#ff7300' : '#555',
-                                borderColor: alarm.enabled ? '#ff7300' : '#555',
+                                color: alarm.enabled ? 'primary.main' : 'text.disabled',
+                                borderColor: alarm.enabled ? 'primary.main' : 'text.disabled',
                               }}
                               variant="outlined"
                             />
@@ -617,10 +624,10 @@ export function Alarm() {
                                 sx={{
                                   fontSize: '0.7rem',
                                   height: 20,
-                                  color: alarm.enabled ? '#ff7300' : '#555',
+                                  color: alarm.enabled ? 'primary.main' : 'text.disabled',
                                   borderColor: alarm.enabled
-                                    ? '#ff7300'
-                                    : '#555',
+                                    ? 'primary.main'
+                                    : 'text.disabled',
                                 }}
                                 variant="outlined"
                               />
@@ -643,28 +650,19 @@ export function Alarm() {
                     <Switch
                       checked={alarm.enabled}
                       onChange={() => handleToggleAlarm(alarm)}
-                      sx={{
-                        '& .MuiSwitch-switchBase.Mui-checked': {
-                          color: '#ff7300',
-                        },
-                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track':
-                          {
-                            backgroundColor: '#ff7300',
-                          },
-                      }}
                     />
                     {((alarm.isShared && alarm.ownerId === user?.uid) ||
                       !alarm.isShared) && (
                       <IconButton
                         onClick={() => handleShowEditDialog(alarm)}
-                        sx={{ color: '#aaa' }}
+                        sx={{ color: 'text.secondary' }}
                       >
                         <IoMdCreate />
                       </IconButton>
                     )}
                     <IconButton
                       onClick={() => handleDeleteAlarm(alarm)}
-                      sx={{ color: '#ff4444' }}
+                      sx={{ color: 'error.main' }}
                     >
                       <IoMdTrash />
                     </IconButton>
@@ -682,7 +680,8 @@ export function Alarm() {
         onClose={() => setShowAddDialog(false)}
         PaperProps={{
           sx: {
-            background: 'rgba(30, 30, 30, 0.95)',
+            backgroundColor: alpha(theme.palette.background.paper, 0.95),
+            backdropFilter: 'blur(12px)',
             minWidth: { xs: '90%', sm: 350 },
           },
         }}
@@ -767,8 +766,7 @@ export function Alarm() {
                     checked={newDays.includes(index)}
                     onChange={() => handleToggleDay(index)}
                     sx={{
-                      color: '#666',
-                      '&.Mui-checked': { color: '#ff7300' },
+                      '&.Mui-checked': { color: 'primary.main' },
                       padding: '4px',
                     }}
                     size="small"
@@ -795,8 +793,7 @@ export function Alarm() {
                         checked={selectedFriends.includes(friend.uid)}
                         onChange={() => handleToggleFriend(friend.uid)}
                         sx={{
-                          color: '#666',
-                          '&.Mui-checked': { color: '#ff7300' },
+                          '&.Mui-checked': { color: 'primary.main' },
                           padding: '4px',
                         }}
                         size="small"
@@ -809,7 +806,7 @@ export function Alarm() {
               {selectedFriends.length > 0 && (
                 <Typography
                   variant="caption"
-                  sx={{ color: '#ff7300', mt: 0.5, display: 'block' }}
+                  sx={{ color: 'primary.main', mt: 0.5, display: 'block' }}
                 >
                   This alarm will sync with selected friends.
                 </Typography>
@@ -834,8 +831,6 @@ export function Alarm() {
             onClick={handleAddAlarm}
             variant="contained"
             sx={{
-              backgroundColor: '#ff7300',
-              '&:hover': { backgroundColor: '#e56700' },
               width: { xs: '100%', sm: 'auto' },
             }}
           >
@@ -850,7 +845,8 @@ export function Alarm() {
         onClose={() => setEditingAlarm(null)}
         PaperProps={{
           sx: {
-            background: 'rgba(30, 30, 30, 0.95)',
+            backgroundColor: alpha(theme.palette.background.paper, 0.95),
+            backdropFilter: 'blur(12px)',
             minWidth: { xs: '90%', sm: 350 },
           },
         }}
@@ -935,8 +931,7 @@ export function Alarm() {
                     checked={newDays.includes(index)}
                     onChange={() => handleToggleDay(index)}
                     sx={{
-                      color: '#666',
-                      '&.Mui-checked': { color: '#ff7300' },
+                      '&.Mui-checked': { color: 'primary.main' },
                       padding: '4px',
                     }}
                     size="small"
@@ -964,8 +959,6 @@ export function Alarm() {
             onClick={handleUpdateAlarm}
             variant="contained"
             sx={{
-              backgroundColor: '#ff7300',
-              '&:hover': { backgroundColor: '#e56700' },
               width: { xs: '100%', sm: 'auto' },
             }}
           >
@@ -980,7 +973,8 @@ export function Alarm() {
         onClose={handleDismissAlarm}
         PaperProps={{
           sx: {
-            background: 'rgba(30, 30, 30, 0.95)',
+            backgroundColor: alpha(theme.palette.background.paper, 0.95),
+            backdropFilter: 'blur(12px)',
             minWidth: { xs: '90%', sm: 350 },
             textAlign: 'center',
           },
@@ -991,7 +985,7 @@ export function Alarm() {
             component={IoMdNotifications}
             sx={{
               fontSize: { xs: 48, sm: 64 },
-              color: '#ff7300',
+              color: 'primary.main',
               animation: 'shake 0.5s ease-in-out infinite',
             }}
           />
@@ -1009,8 +1003,8 @@ export function Alarm() {
               size="small"
               sx={{
                 mt: 1,
-                color: '#ff7300',
-                borderColor: '#ff7300',
+                color: 'primary.main',
+                borderColor: 'primary.main',
               }}
               variant="outlined"
             />
@@ -1029,13 +1023,10 @@ export function Alarm() {
             onClick={handleSnooze}
             variant="outlined"
             size="large"
-            sx={{
-              borderColor: '#ff7300',
-              color: '#ff7300',
-              '&:hover': { borderColor: '#e56700', color: '#e56700' },
-              px: 4,
-              width: { xs: '100%', sm: 'auto' },
-            }}
+             sx={{
+               px: 4,
+               width: { xs: '100%', sm: 'auto' },
+             }}
           >
             Snooze (5 min)
           </Button>
@@ -1043,12 +1034,10 @@ export function Alarm() {
             onClick={handleDismissAlarm}
             variant="contained"
             size="large"
-            sx={{
-              backgroundColor: '#ff7300',
-              '&:hover': { backgroundColor: '#e56700' },
-              px: 4,
-              width: { xs: '100%', sm: 'auto' },
-            }}
+             sx={{
+               px: 4,
+               width: { xs: '100%', sm: 'auto' },
+             }}
           >
             Dismiss
           </Button>

@@ -1,43 +1,12 @@
 /*
- * @NOTE: Prepend a `~` to css file paths that are in your node_modules
- *        See https://github.com/webpack-contrib/sass-loader#imports
+ * Base layout styles
  */
 body {
-  position: relative;
-  color: #f2f2f2;
-  min-height: 100vh;
-  background: linear-gradient(
-    200.96deg,
-    #0f0f0f -29.09%,
-    #0f0f0f 51.77%,
-    #0f0f0f 129.35%
-  );
-  font-family: sans-serif;
-  overflow-y: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto;
   margin: 0;
-}
-
-button {
-  background-color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  appearance: none;
-  font-size: 1.3rem;
-  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
-    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
-  transition: all ease-in 0.1s;
-  cursor: pointer;
-  opacity: 0.9;
-}
-
-button:hover {
-  transform: scale(1.05);
-  opacity: 1;
+  padding: 0;
+  font-family: sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 li {
@@ -46,24 +15,17 @@ li {
 
 a {
   text-decoration: none;
-  height: fit-content;
-  width: fit-content;
-  margin: 10px;
-}
-
-a:hover {
-  opacity: 1;
-  text-decoration: none;
-}
-
-.Hello {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
+  color: inherit;
 }
 
 .main-content {
-  margin: 2rem;
-  margin-top: 80px;
+  padding: 1rem;
+  margin-top: 64px; /* Space for navbar */
+  min-height: calc(100vh - 64px);
+}
+
+@media (min-width: 600px) {
+  .main-content {
+    padding: 2rem;
+  }
 }

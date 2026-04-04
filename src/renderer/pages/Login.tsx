@@ -15,6 +15,8 @@ import {
   InputAdornment,
   Alert,
   CircularProgress,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import { IoMdEye, IoMdEyeOff, IoMdMail, IoMdLock } from 'react-icons/io';
 import { auth } from '../firebaseConfig';
@@ -23,6 +25,7 @@ import { useAuth } from '../contexts/AuthContext';
 export function Login() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const theme = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -120,8 +123,9 @@ export function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background:
-          'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        background: theme.palette.mode === 'dark'
+          ? 'linear-gradient(200.96deg, #0a0a0a -29.09%, #1a1a1a 129.35%)'
+          : 'linear-gradient(200.96deg, #f8f9fa -29.09%, #e9ecef 129.35%)',
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -132,7 +136,7 @@ export function Login() {
           width: '100%',
           maxWidth: 420,
           borderRadius: 3,
-          background: 'rgba(30, 30, 30, 0.9)',
+          backgroundColor: alpha(theme.palette.background.paper, 0.9),
           backdropFilter: 'blur(10px)',
         }}
       >
@@ -142,7 +146,7 @@ export function Login() {
             component="h1"
             sx={{
               fontWeight: 800,
-              color: '#F4F3F2',
+              color: 'text.primary',
               mb: 1,
             }}
           >
@@ -227,7 +231,7 @@ export function Login() {
                 padding: 0,
                 minWidth: 'auto',
                 '&:hover': {
-                  color: '#F4F3F2',
+                  color: 'text.primary',
                   backgroundColor: 'transparent',
                   textDecoration: 'underline',
                 },
@@ -247,10 +251,6 @@ export function Login() {
               py: 1.5,
               fontSize: '1rem',
               fontWeight: 600,
-              backgroundColor: '#ff7300',
-              '&:hover': {
-                backgroundColor: '#e56700',
-              },
               mb: 2,
             }}
           >
@@ -269,9 +269,7 @@ export function Login() {
                 to="/signup"
                 underline="hover"
                 sx={{
-                  color: '#ff7300',
                   fontWeight: 600,
-                  '&:hover': { color: '#e56700' },
                 }}
               >
                 Sign Up

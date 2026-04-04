@@ -12,7 +12,9 @@ import {
   CircularProgress,
   Chip,
   IconButton,
+  useTheme as useMuiTheme,
 } from '@mui/material';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   IoMdPhonePortrait,
   IoMdCheckmarkCircle,
@@ -37,6 +39,8 @@ declare global {
 export function Settings() {
   const { user } = useAuth();
   const { userProfile } = useFriends();
+  const { mode, toggleTheme } = useTheme();
+  const muiTheme = useMuiTheme();
   const [is24Hour, setIs24Hour] = useState(false);
 
   // Phone verification
@@ -165,12 +169,34 @@ export function Settings() {
         Settings
       </Typography>
 
+      {/* Theme Settings */}
+      <Paper
+        sx={{
+          p: { xs: 2, sm: 3 },
+          mb: { xs: 2, sm: 3 },
+          backgroundColor: muiTheme.palette.background.paper,
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Theme
+        </Typography>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={mode === 'dark'}
+              onChange={toggleTheme}
+            />
+          }
+          label="Dark Mode"
+        />
+      </Paper>
+
       {/* Clock Settings */}
       <Paper
         sx={{
           p: { xs: 2, sm: 3 },
           mb: { xs: 2, sm: 3 },
-          background: 'rgba(30, 30, 30, 0.7)',
+          backgroundColor: muiTheme.palette.background.paper,
         }}
       >
         <Typography variant="h6" sx={{ mb: 2 }}>
@@ -181,12 +207,6 @@ export function Settings() {
             <Switch
               checked={is24Hour}
               onChange={handleToggle}
-              sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': { color: '#ff7300' },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#ff7300',
-                },
-              }}
             />
           }
           label="24-Hour Format"
@@ -199,7 +219,7 @@ export function Settings() {
           sx={{
             p: { xs: 2, sm: 3 },
             mb: { xs: 2, sm: 3 },
-            background: 'rgba(30, 30, 30, 0.7)',
+            backgroundColor: muiTheme.palette.background.paper,
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
@@ -235,7 +255,7 @@ export function Settings() {
                   size="small"
                   onClick={handleResendEmailVerification}
                   disabled={emailSending}
-                  sx={{ color: '#ff7300', fontSize: '0.75rem' }}
+                  sx={{ color: 'primary.main', fontSize: '0.75rem' }}
                 >
                   {emailSending ? 'Sending...' : 'Verify Email'}
                 </Button>
@@ -288,7 +308,7 @@ export function Settings() {
                 sx={{
                   fontFamily: 'monospace',
                   letterSpacing: 2,
-                  color: '#ff7300',
+                  color: 'primary.main',
                 }}
               >
                 {userProfile?.friendCode || '------'}
@@ -315,7 +335,7 @@ export function Settings() {
           sx={{
             p: { xs: 2, sm: 3 },
             mb: { xs: 2, sm: 3 },
-            background: 'rgba(30, 30, 30, 0.7)',
+            backgroundColor: muiTheme.palette.background.paper,
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
@@ -362,10 +382,7 @@ export function Settings() {
                 variant="contained"
                 onClick={handleSendPhoneCode}
                 disabled={phoneLoading || !phoneNumber}
-                sx={{
-                  backgroundColor: '#ff7300',
-                  '&:hover': { backgroundColor: '#e56700' },
-                }}
+
               >
                 {phoneLoading ? (
                   <CircularProgress size={24} sx={{ color: '#fff' }} />

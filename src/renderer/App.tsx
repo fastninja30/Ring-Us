@@ -6,8 +6,6 @@ import {
 } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import '@fontsource/open-sans';
-import '@fontsource/open-sans/800.css';
 import './App.css';
 import { AuthProvider } from './contexts/AuthContext';
 import { FriendsProvider } from './contexts/FriendsContext';
@@ -70,9 +68,7 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
             },
           }),
     },
-    typography: {
-      fontFamily: 'san francisco, sans-serif',
-    },
+
   });
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
@@ -81,8 +77,21 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
-      <Navbar />
-      <div className="main-content">{children}</div>
+      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+        <Navbar />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: { xs: 2, sm: 3 },
+            mt: { xs: 8, md: 0 },
+            ml: { xs: 0, md: `${drawerWidth}px` },
+            width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+          }}
+        >
+          {children}
+        </Box>
+      </Box>
     </ProtectedRoute>
   );
 }
@@ -117,68 +126,54 @@ export default function App() {
             <Router>
               <NavigationHandler />
               <CssBaseline />
-              <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-                <Navbar />
-                <Box
-                  component="main"
-                  sx={{
-                    flexGrow: 1,
-                    p: { xs: 2, sm: 3 },
-                    mt: { xs: 6, md: 0 },
-                    ml: { xs: 0, md: `${drawerWidth}px` },
-                    width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
-                  }}
-                >
-                  <Routes>
-                    {/* Public routes */}
-                    <Route path="/" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/verify-email" element={<VerifyEmail />} />
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
 
-                    {/* Protected routes */}
-                    <Route
-                      path="/alarm"
-                      element={
-                        <ProtectedLayout>
-                          <Alarm />
-                        </ProtectedLayout>
-                      }
-                    />
-                    <Route
-                      path="/book-list"
-                      element={
-                        <ProtectedLayout>
-                          <BookList />
-                        </ProtectedLayout>
-                      }
-                    />
-                    <Route
-                      path="/about"
-                      element={
-                        <ProtectedLayout>
-                          <About />
-                        </ProtectedLayout>
-                      }
-                    />
-                    <Route
-                      path="/settings"
-                      element={
-                        <ProtectedLayout>
-                          <Settings />
-                        </ProtectedLayout>
-                      }
-                    />
-                    <Route
-                      path="/friends"
-                      element={
-                        <ProtectedLayout>
-                          <Friends />
-                        </ProtectedLayout>
-                      }
-                    />
-                  </Routes>
-                </Box>
-              </Box>
+                {/* Protected routes */}
+                <Route
+                  path="/alarm"
+                  element={
+                    <ProtectedLayout>
+                      <Alarm />
+                    </ProtectedLayout>
+                  }
+                />
+                <Route
+                  path="/book-list"
+                  element={
+                    <ProtectedLayout>
+                      <BookList />
+                    </ProtectedLayout>
+                  }
+                />
+                <Route
+                  path="/about"
+                  element={
+                    <ProtectedLayout>
+                      <About />
+                    </ProtectedLayout>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedLayout>
+                      <Settings />
+                    </ProtectedLayout>
+                  }
+                />
+                <Route
+                  path="/friends"
+                  element={
+                    <ProtectedLayout>
+                      <Friends />
+                    </ProtectedLayout>
+                  }
+                />
+              </Routes>
             </Router>
           </FriendsProvider>
         </AuthProvider>
