@@ -13,6 +13,7 @@ import {
   ThemeProvider as CustomThemeProvider,
   useTheme,
 } from './contexts/ThemeContext';
+import { lightTheme, darkTheme } from './theme';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Navbar } from './components/Navbar';
 import { BookList } from './pages/BookList';
@@ -28,48 +29,7 @@ const drawerWidth = 240;
 
 function ThemeWrapper({ children }: { children: React.ReactNode }) {
   const { mode } = useTheme();
-
-  const theme = createTheme({
-    palette: {
-      mode,
-      ...(mode === 'dark'
-        ? {
-            // Dark Mode Palette
-            primary: {
-              main: '#ff7300',
-            },
-            secondary: {
-              main: '#f50057',
-            },
-            background: {
-              default: '#0f0f0f',
-              paper: '#1e1e1e',
-            },
-            text: {
-              primary: '#f2f2f2',
-              secondary: '#b3b3b3',
-            },
-          }
-        : {
-            // Light Mode Palette
-            primary: {
-              main: '#ff7300',
-            },
-            secondary: {
-              main: '#f50057',
-            },
-            background: {
-              default: '#fafafa',
-              paper: '#ffffff',
-            },
-            text: {
-              primary: '#121212',
-              secondary: '#666666',
-            },
-          }),
-    },
-
-  });
+  const theme = mode === 'dark' ? darkTheme : lightTheme;
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
@@ -100,6 +60,8 @@ function NavigationHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!window.electron?.ipcRenderer) return;
+
     const removeListener = window.electron.ipcRenderer.on(
       'navigate',
       (path) => {
@@ -110,7 +72,7 @@ function NavigationHandler() {
     );
 
     return () => {
-      removeListener();
+      if (removeListener) removeListener();
     };
   }, [navigate]);
 

@@ -50,7 +50,7 @@ export function Navbar() {
     <Box sx={{ overflow: 'auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'center' }}>
         <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 800 }}>
-          RingUs
+          Ring Us
         </Typography>
       </Toolbar>
       <List>
@@ -140,7 +140,7 @@ export function Navbar() {
               <IoMdMenu />
             </IconButton>
             <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 800 }}>
-              RingUs
+              Ring Us
             </Typography>
           </Toolbar>
         </AppBar>
