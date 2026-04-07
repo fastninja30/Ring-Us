@@ -22,7 +22,25 @@ const sharedThemeOptions: ThemeOptions = {
         },
       },
     },
-  },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          borderRadius: "0px 0px 12px 12px",
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: ({ theme }) => ({
+          '&.RingUsDrawer-paper': {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            borderRadius: "0px 12px 12px 0px",
+          },
+        }),
+      },
+    },
+  }
 };
 
 export const lightTheme = createTheme({

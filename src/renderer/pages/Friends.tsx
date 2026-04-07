@@ -14,6 +14,8 @@ import {
   Alert,
   Snackbar,
   CircularProgress,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import {
   IoMdCopy,
@@ -35,6 +37,7 @@ export function Friends() {
     declineFriendRequest,
     removeFriend,
   } = useFriends();
+  const theme = useTheme();
 
   const [friendCode, setFriendCode] = useState('');
   const [error, setError] = useState('');
@@ -93,7 +96,7 @@ export function Friends() {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
-        <CircularProgress sx={{ color: '#ff7300' }} />
+        <CircularProgress />
       </Box>
     );
   }
@@ -105,7 +108,7 @@ export function Friends() {
       </Typography>
 
       {/* Your Friend Code */}
-      <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
+      <Paper sx={{ p: 3, mb: 3, backgroundColor: alpha(theme.palette.background.paper, 0.8), backdropFilter: 'blur(8px)' }}>
         <Typography variant="h6" sx={{ mb: 1 }}>
           Your Friend Code
         </Typography>
@@ -119,19 +122,19 @@ export function Friends() {
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: 4,
-              color: '#ff7300',
+              color: 'primary.main',
             }}
           >
             {userProfile?.friendCode || '------'}
           </Typography>
-          <IconButton onClick={handleCopyCode} sx={{ color: '#ff7300' }}>
+          <IconButton onClick={handleCopyCode} color="primary">
             <IoMdCopy />
           </IconButton>
         </Box>
       </Paper>
 
       {/* Add a Friend */}
-      <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
+      <Paper sx={{ p: 3, mb: 3, backgroundColor: alpha(theme.palette.background.paper, 0.8), backdropFilter: 'blur(8px)' }}>
         <Typography variant="h6" sx={{ mb: 1 }}>
           Add a Friend
         </Typography>
@@ -180,8 +183,7 @@ export function Friends() {
               )
             }
             sx={{
-              backgroundColor: '#ff7300',
-              '&:hover': { backgroundColor: '#e56700' },
+              flexShrink: 0,
             }}
           >
             Send Request
@@ -191,7 +193,7 @@ export function Friends() {
 
       {/* Pending Requests */}
       {(pendingRequests.length > 0 || outgoingRequests.length > 0) && (
-        <Paper sx={{ p: 3, mb: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
+        <Paper sx={{ p: 3, mb: 3, backgroundColor: alpha(theme.palette.background.paper, 0.8), backdropFilter: 'blur(8px)' }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Pending Requests
           </Typography>
@@ -210,14 +212,14 @@ export function Friends() {
                       <ListItemSecondaryAction sx={{ display: 'flex', gap: 1 }}>
                         <IconButton
                           onClick={() => handleAccept(req.id)}
-                          sx={{ color: '#4caf50' }}
+                          color="success"
                           size="small"
                         >
                           <IoMdCheckmark />
                         </IconButton>
                         <IconButton
                           onClick={() => handleDecline(req.id)}
-                          sx={{ color: '#ff4444' }}
+                          color="error"
                           size="small"
                         >
                           <IoMdClose />
@@ -252,7 +254,7 @@ export function Friends() {
       )}
 
       {/* Friends List */}
-      <Paper sx={{ p: 3, background: 'rgba(30, 30, 30, 0.7)' }}>
+      <Paper sx={{ p: 3, backgroundColor: alpha(theme.palette.background.paper, 0.8), backdropFilter: 'blur(8px)' }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
           Your Friends
         </Typography>
@@ -270,7 +272,7 @@ export function Friends() {
                   <ListItemSecondaryAction>
                     <IconButton
                       onClick={() => handleRemoveFriend(friend.uid)}
-                      sx={{ color: '#ff4444' }}
+                      color="error"
                       size="small"
                     >
                       <IoMdClose />

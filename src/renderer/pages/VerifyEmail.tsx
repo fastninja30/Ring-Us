@@ -8,6 +8,8 @@ import {
   Paper,
   Alert,
   CircularProgress,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import { IoMdMail } from 'react-icons/io';
 import { auth } from '../firebaseConfig';
@@ -15,6 +17,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export function VerifyEmail() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const { user } = useAuth();
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState('');
@@ -65,8 +68,9 @@ export function VerifyEmail() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background:
-          'linear-gradient(200.96deg, #0f0f0f -29.09%, #0f0f0f 51.77%, #0f0f0f 129.35%)',
+        background: theme.palette.mode === 'dark'
+          ? 'linear-gradient(200.96deg, #0a0a0a -29.09%, #1a1a1a 129.35%)'
+          : 'linear-gradient(200.96deg, #f8f9fa -29.09%, #e9ecef 129.35%)',
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -77,7 +81,7 @@ export function VerifyEmail() {
           width: '100%',
           maxWidth: 460,
           borderRadius: 3,
-          background: 'rgba(30, 30, 30, 0.9)',
+          backgroundColor: alpha(theme.palette.background.paper, 0.9),
           backdropFilter: 'blur(10px)',
           textAlign: 'center',
         }}
@@ -85,7 +89,7 @@ export function VerifyEmail() {
         <Box
           sx={{
             fontSize: { xs: 48, sm: 64 },
-            color: '#ff7300',
+            color: 'primary.main',
             mb: 0.5,
             display: 'inline-flex',
           }}
@@ -95,14 +99,14 @@ export function VerifyEmail() {
 
         <Typography
           variant="h4"
-          sx={{ fontWeight: 800, color: '#F4F3F2', mb: 1 }}
+          sx={{ fontWeight: 800, color: 'text.primary', mb: 1 }}
         >
           Verify Your Email
         </Typography>
 
         <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
           We sent a verification link to{' '}
-          <strong style={{ color: '#ff7300' }}>{user?.email}</strong>
+          <strong style={{ color: theme.palette.primary.main }}>{user?.email}</strong>
           .Please check your inbox and click the link to verify your account.
         </Typography>
 
@@ -125,8 +129,6 @@ export function VerifyEmail() {
             py: 1.5,
             fontSize: '1rem',
             fontWeight: 600,
-            backgroundColor: '#ff7300',
-            '&:hover': { backgroundColor: '#e56700' },
             mb: 2,
           }}
         >
@@ -141,9 +143,6 @@ export function VerifyEmail() {
           sx={{
             py: 1.5,
             fontSize: '1rem',
-            borderColor: '#ff7300',
-            color: '#ff7300',
-            '&:hover': { borderColor: '#e56700', color: '#e56700' },
             mb: 2,
           }}
         >
@@ -158,7 +157,7 @@ export function VerifyEmail() {
           fullWidth
           variant="text"
           onClick={handleSignOut}
-          sx={{ color: 'text.secondary', '&:hover': { color: '#F4F3F2' } }}
+          sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
         >
           Sign Out
         </Button>
