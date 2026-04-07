@@ -28,6 +28,7 @@ import { useFriends } from '../contexts/FriendsContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 const drawerWidth = 240;
+const drawerPaperClass = 'RingUsDrawer-paper';
 
 export function Navbar() {
   const { pendingRequestCount } = useFriends();
@@ -153,9 +154,10 @@ export function Navbar() {
           onOpen={() => setMobileOpen(true)}
           onClose={() => setMobileOpen(false)}
           ModalProps={{ keepMounted: true }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: '#ff7300', color: '#F4F3F2' },
+          sx={{ display: { xs: 'block', md: 'none' } }}
+          PaperProps={{
+            className: drawerPaperClass,
+            sx: { boxSizing: 'border-box', width: drawerWidth },
           }}
         >
           {drawerContent}
@@ -163,9 +165,10 @@ export function Navbar() {
       ) : (
         <Drawer
           variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: '#ff7300', color: '#F4F3F2' },
+          sx={{ display: { xs: 'none', md: 'block' } }}
+          PaperProps={{
+            className: drawerPaperClass,
+            sx: { boxSizing: 'border-box', width: drawerWidth },
           }}
           open
         >
