@@ -69,8 +69,8 @@ export function VerifyEmail() {
         alignItems: 'center',
         justifyContent: 'center',
         background: theme.palette.mode === 'dark'
-          ? 'linear-gradient(200.96deg, #0a0a0a -29.09%, #1a1a1a 129.35%)'
-          : 'linear-gradient(200.96deg, #f8f9fa -29.09%, #e9ecef 129.35%)',
+            ? 'linear-gradient(200.96deg, #0a0a0a -29.09%, #1a1a1a 129.35%)'
+            : 'linear-gradient(200.96deg, #f8f9fa -29.09%, #e9ecef 129.35%)',
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -106,7 +106,9 @@ export function VerifyEmail() {
 
         <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
           We sent a verification link to{' '}
-          <strong style={{ color: theme.palette.primary.main }}>{user?.email}</strong>
+          <strong style={{ color: theme.palette.primary.main }}>
+            {user?.email}
+          </strong>
           .Please check your inbox and click the link to verify your account.
         </Typography>
 

@@ -123,9 +123,10 @@ export function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: theme.palette.mode === 'dark'
-          ? 'linear-gradient(200.96deg, #0a0a0a -29.09%, #1a1a1a 129.35%)'
-          : 'linear-gradient(200.96deg, #f8f9fa -29.09%, #e9ecef 129.35%)',
+        background:
+          theme.palette.mode === 'dark'
+            ? 'linear-gradient(200.96deg, #0a0a0a -29.09%, #1a1a1a 129.35%)'
+            : 'linear-gradient(200.96deg, #f8f9fa -29.09%, #e9ecef 129.35%)',
         p: { xs: 2, sm: 3 },
       }}
     >

@@ -14,7 +14,6 @@ import {
   IconButton,
   useTheme as useMuiTheme,
 } from '@mui/material';
-import { useTheme } from '../contexts/ThemeContext';
 import {
   IoMdPhonePortrait,
   IoMdCheckmarkCircle,
@@ -26,6 +25,7 @@ import {
   RecaptchaVerifier,
   sendEmailVerification,
 } from 'firebase/auth';
+import { useTheme } from '../contexts/ThemeContext';
 import { auth } from '../firebaseConfig';
 import { useAuth } from '../contexts/AuthContext';
 import { useFriends } from '../contexts/FriendsContext';
@@ -181,12 +181,7 @@ export function Settings() {
           Theme
         </Typography>
         <FormControlLabel
-          control={
-            <Switch
-              checked={mode === 'dark'}
-              onChange={toggleTheme}
-            />
-          }
+          control={<Switch checked={mode === 'dark'} onChange={toggleTheme} />}
           label="Dark Mode"
         />
       </Paper>
@@ -203,12 +198,7 @@ export function Settings() {
           Clock
         </Typography>
         <FormControlLabel
-          control={
-            <Switch
-              checked={is24Hour}
-              onChange={handleToggle}
-            />
-          }
+          control={<Switch checked={is24Hour} onChange={handleToggle} />}
           label="24-Hour Format"
         />
       </Paper>
@@ -382,7 +372,6 @@ export function Settings() {
                 variant="contained"
                 onClick={handleSendPhoneCode}
                 disabled={phoneLoading || !phoneNumber}
-
               >
                 {phoneLoading ? (
                   <CircularProgress size={24} sx={{ color: '#fff' }} />

@@ -48,9 +48,21 @@ export function Navbar() {
   };
 
   const drawerContent = (
-    <Box sx={{ overflow: 'auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        overflow: 'auto',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <Toolbar sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 800 }}>
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ fontWeight: 800 }}
+        >
           Ring Us
         </Typography>
       </Toolbar>
@@ -117,7 +129,9 @@ export function Navbar() {
             <ListItemIcon sx={{ color: 'inherit' }}>
               {mode === 'dark' ? <FiSun /> : <FiMoon />}
             </ListItemIcon>
-            <ListItemText primary={mode === 'dark' ? 'Light Mode' : 'Dark Mode'} />
+            <ListItemText
+              primary={mode === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            />
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -135,12 +149,30 @@ export function Navbar() {
   return (
     <>
       {isMobile && (
-        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer - 1, backgroundColor: 'primary.main', color: '#fff' }}>
+        <AppBar
+          position="fixed"
+          sx={{
+            zIndex: (theme) => theme.zIndex.drawer - 1,
+            backgroundColor: 'primary.main',
+            color: '#fff',
+          }}
+        >
           <Toolbar>
-            <IconButton edge="start" color="inherit" aria-label="open drawer" onClick={handleDrawerToggle} sx={{ mr: 2 }}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 }}
+            >
               <IoMdMenu />
             </IconButton>
-            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 800 }}>
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ fontWeight: 800 }}
+            >
               Ring Us
             </Typography>
           </Toolbar>

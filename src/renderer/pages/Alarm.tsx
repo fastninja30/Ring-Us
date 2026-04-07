@@ -549,7 +549,9 @@ export function Alarm() {
                         variant="h4"
                         sx={{
                           fontWeight: 300,
-                          color: alarm.enabled ? 'text.primary' : 'text.disabled',
+                          color: alarm.enabled
+                            ? 'text.primary'
+                            : 'text.disabled',
                           fontSize: { xs: '1.5rem', sm: '2rem' },
                         }}
                       >
@@ -562,7 +564,9 @@ export function Alarm() {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: alarm.enabled ? 'text.secondary' : 'text.disabled',
+                              color: alarm.enabled
+                                ? 'text.secondary'
+                                : 'text.disabled',
                             }}
                           >
                             {alarm.label}
@@ -572,7 +576,9 @@ export function Alarm() {
                           <Typography
                             variant="body2"
                             sx={{
-                              color: alarm.enabled ? 'primary.main' : 'text.disabled',
+                              color: alarm.enabled
+                                ? 'primary.main'
+                                : 'text.disabled',
                               fontSize: '0.75rem',
                             }}
                           >
@@ -597,8 +603,12 @@ export function Alarm() {
                               sx={{
                                 fontSize: '0.7rem',
                                 height: 20,
-                                color: alarm.enabled ? 'primary.main' : 'text.disabled',
-                                borderColor: alarm.enabled ? 'primary.main' : 'text.disabled',
+                                color: alarm.enabled
+                                  ? 'primary.main'
+                                  : 'text.disabled',
+                                borderColor: alarm.enabled
+                                  ? 'primary.main'
+                                  : 'text.disabled',
                               }}
                               variant="outlined"
                             />
@@ -610,8 +620,12 @@ export function Alarm() {
                               sx={{
                                 fontSize: '0.7rem',
                                 height: 20,
-                                color: alarm.enabled ? 'primary.main' : 'text.disabled',
-                                borderColor: alarm.enabled ? 'primary.main' : 'text.disabled',
+                                color: alarm.enabled
+                                  ? 'primary.main'
+                                  : 'text.disabled',
+                                borderColor: alarm.enabled
+                                  ? 'primary.main'
+                                  : 'text.disabled',
                               }}
                               variant="outlined"
                             />
@@ -624,7 +638,9 @@ export function Alarm() {
                                 sx={{
                                   fontSize: '0.7rem',
                                   height: 20,
-                                  color: alarm.enabled ? 'primary.main' : 'text.disabled',
+                                  color: alarm.enabled
+                                    ? 'primary.main'
+                                    : 'text.disabled',
                                   borderColor: alarm.enabled
                                     ? 'primary.main'
                                     : 'text.disabled',
@@ -1023,10 +1039,10 @@ export function Alarm() {
             onClick={handleSnooze}
             variant="outlined"
             size="large"
-             sx={{
-               px: 4,
-               width: { xs: '100%', sm: 'auto' },
-             }}
+            sx={{
+              px: 4,
+              width: { xs: '100%', sm: 'auto' },
+            }}
           >
             Snooze (5 min)
           </Button>
@@ -1034,10 +1050,10 @@ export function Alarm() {
             onClick={handleDismissAlarm}
             variant="contained"
             size="large"
-             sx={{
-               px: 4,
-               width: { xs: '100%', sm: 'auto' },
-             }}
+            sx={{
+              px: 4,
+              width: { xs: '100%', sm: 'auto' },
+            }}
           >
             Dismiss
           </Button>

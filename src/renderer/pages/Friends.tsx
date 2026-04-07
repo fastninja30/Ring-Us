@@ -108,7 +108,14 @@ export function Friends() {
       </Typography>
 
       {/* Your Friend Code */}
-      <Paper sx={{ p: 3, mb: 3, backgroundColor: alpha(theme.palette.background.paper, 0.8), backdropFilter: 'blur(8px)' }}>
+      <Paper
+        sx={{
+          p: 3,
+          mb: 3,
+          backgroundColor: alpha(theme.palette.background.paper, 0.8),
+          backdropFilter: 'blur(8px)',
+        }}
+      >
         <Typography variant="h6" sx={{ mb: 1 }}>
           Your Friend Code
         </Typography>
@@ -134,7 +141,14 @@ export function Friends() {
       </Paper>
 
       {/* Add a Friend */}
-      <Paper sx={{ p: 3, mb: 3, backgroundColor: alpha(theme.palette.background.paper, 0.8), backdropFilter: 'blur(8px)' }}>
+      <Paper
+        sx={{
+          p: 3,
+          mb: 3,
+          backgroundColor: alpha(theme.palette.background.paper, 0.8),
+          backdropFilter: 'blur(8px)',
+        }}
+      >
         <Typography variant="h6" sx={{ mb: 1 }}>
           Add a Friend
         </Typography>
@@ -193,7 +207,14 @@ export function Friends() {
 
       {/* Pending Requests */}
       {(pendingRequests.length > 0 || outgoingRequests.length > 0) && (
-        <Paper sx={{ p: 3, mb: 3, backgroundColor: alpha(theme.palette.background.paper, 0.8), backdropFilter: 'blur(8px)' }}>
+        <Paper
+          sx={{
+            p: 3,
+            mb: 3,
+            backgroundColor: alpha(theme.palette.background.paper, 0.8),
+            backdropFilter: 'blur(8px)',
+          }}
+        >
           <Typography variant="h6" sx={{ mb: 2 }}>
             Pending Requests
           </Typography>
@@ -254,7 +275,13 @@ export function Friends() {
       )}
 
       {/* Friends List */}
-      <Paper sx={{ p: 3, backgroundColor: alpha(theme.palette.background.paper, 0.8), backdropFilter: 'blur(8px)' }}>
+      <Paper
+        sx={{
+          p: 3,
+          backgroundColor: alpha(theme.palette.background.paper, 0.8),
+          backdropFilter: 'blur(8px)',
+        }}
+      >
         <Typography variant="h6" sx={{ mb: 2 }}>
           Your Friends
         </Typography>

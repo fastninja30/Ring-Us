@@ -5,7 +5,7 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import React, { useEffect } from 'react';
-import { Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { Box, CssBaseline, ThemeProvider } from '@mui/material';
 import './App.css';
 import { AuthProvider } from './contexts/AuthContext';
 import { FriendsProvider } from './contexts/FriendsContext';
@@ -60,7 +60,7 @@ function NavigationHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!window.electron?.ipcRenderer) return;
+    if (!window.electron?.ipcRenderer) return () => {};
 
     const removeListener = window.electron.ipcRenderer.on(
       'navigate',
