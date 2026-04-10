@@ -281,6 +281,42 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       batch.update(doc(db, 'users', friendUid), {
         friends: arrayRemove(user.uid),
       });
+
+      // Ripple alarm delete
+      const alarmsQuery = query(
+        collection(db, 'sharedAlarms'),
+        where('participants', 'array-contains', user.uid),
+      );
+      const alarmsSnap = await getDocs(alarmsQuery);
+
+      alarmsSnap.forEach((alarmDoc) => {
+        const data = alarmDoc.data();
+        if (data.participants && data.participants.includes(friendUid)) {
+          if (data.ownerId === user.uid || data.ownerId === friendUid) {
+            if (data.participants.length <= 2) {
+              batch.delete(alarmDoc.ref);
+            } else {
+              const uidToRemove = data.ownerId === user.uid ? friendUid : user.uid;
+              
+              const pIndex = data.participants.indexOf(uidToRemove);
+              if (pIndex > -1) {
+                const newParticipants = [...data.participants];
+                const newNames = data.participantNames ? [...data.participantNames] : [];
+                newParticipants.splice(pIndex, 1);
+                if (newNames.length > pIndex) {
+                  newNames.splice(pIndex, 1);
+                }
+
+                batch.update(alarmDoc.ref, {
+                  participants: newParticipants,
+                  participantNames: newNames,
+                });
+              }
+            }
+          }
+        }
+      });
+      // Ripple alarm delete END
       await batch.commit();
     },
     [user],
