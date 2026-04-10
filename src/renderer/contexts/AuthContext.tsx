@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
+  // UPDATE WHEN ADD FRIENDS BUTTON, THIS STORES USER INFO INTO CACHE
   const value = useMemo(
     () => ({
       user,
