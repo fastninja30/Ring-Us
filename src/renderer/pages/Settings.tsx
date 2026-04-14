@@ -18,15 +18,18 @@ import {
   IoMdPhonePortrait,
   IoMdCheckmarkCircle,
   IoMdCopy,
+  IoMdCreate,
 } from 'react-icons/io';
 import {
   PhoneAuthProvider,
   linkWithCredential,
   RecaptchaVerifier,
   sendEmailVerification,
+  updateProfile,
 } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
 import { useTheme } from '../contexts/ThemeContext';
-import { auth } from '../firebaseConfig';
+import { auth, db } from '../firebaseConfig';
 import { useAuth } from '../contexts/AuthContext';
 import { useFriends } from '../contexts/FriendsContext';
 
@@ -55,6 +58,19 @@ export function Settings() {
   // Email verification
   const [emailSending, setEmailSending] = useState(false);
   const [emailMessage, setEmailMessage] = useState('');
+
+  // Display Name editing
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [nameLoading, setNameLoading] = useState(false);
+  const [nameError, setNameError] = useState('');
+  const [nameSuccess, setNameSuccess] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setNewName(user.displayName || '');
+    }
+  }, [user]);
 
   useEffect(() => {
     const savedIs24Hour = localStorage.getItem('settings-is24Hour');
@@ -156,6 +172,42 @@ export function Settings() {
     }
   };
 
+  const handleUpdateName = async () => {
+    if (!user) return;
+    const trimmedName = newName.trim();
+    if (!trimmedName) {
+      setNameError('Name cannot be empty.');
+      return;
+    }
+    
+    setNameLoading(true);
+    setNameError('');
+    setNameSuccess('');
+
+    try {
+      // Update Firebase Auth profile
+      await updateProfile(user, { displayName: trimmedName });
+      
+      // Update Firestore user profile
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, { displayName: trimmedName });
+      
+      setNameSuccess('Name updated successfully!');
+      setIsEditingName(false);
+      
+      // Clear success message after a bit
+      setTimeout(() => setNameSuccess(''), 3000);
+      
+      // Reload window to ensure auth context syncs properly everywhere
+      // A more robust app might use a custom event or context update function
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (err: any) {
+      setNameError(err.message || 'Failed to update name.');
+    } finally {
+      setNameLoading(false);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -220,9 +272,60 @@ export function Settings() {
             <Typography variant="body2" color="text.secondary">
               Name
             </Typography>
-            <Typography variant="body1">
-              {user.displayName || 'Not set'}
-            </Typography>
+            {isEditingName ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+                <TextField
+                  size="small"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="Enter new name"
+                  disabled={nameLoading}
+                  fullWidth
+                />
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button 
+                    variant="contained" 
+                    size="small" 
+                    onClick={handleUpdateName}
+                    disabled={nameLoading || !newName.trim() || newName.trim() === user.displayName}
+                  >
+                    {nameLoading ? <CircularProgress size={20} color="inherit" /> : 'Save'}
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    size="small" 
+                    onClick={() => {
+                      setIsEditingName(false);
+                      setNewName(user.displayName || '');
+                      setNameError('');
+                    }}
+                    disabled={nameLoading}
+                  >
+                    Cancel
+                  </Button>
+                </Box>
+                {nameError && <Alert severity="error" sx={{ mt: 1, py: 0 }}>{nameError}</Alert>}
+              </Box>
+            ) : (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body1">
+                  {user.displayName || 'Not set'}
+                </Typography>
+                <IconButton 
+                  size="small" 
+                  onClick={() => setIsEditingName(true)}
+                  sx={{ color: 'text.secondary' }}
+                  aria-label="edit name"
+                >
+                  <IoMdCreate fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
+            {nameSuccess && !isEditingName && (
+              <Alert severity="success" sx={{ mt: 1, py: 0 }}>
+                {nameSuccess}
+              </Alert>
+            )}
           </Box>
 
           <Box sx={{ mb: 2 }}>
