@@ -12,11 +12,13 @@ import { auth } from '../firebaseConfig';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  updateUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  updateUser: () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -34,11 +36,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
+  const updateUser = (updatedUser: User | null) => {
+    setUser(updatedUser);
+  };
+
   // UPDATE WHEN ADD FRIENDS BUTTON, THIS STORES USER INFO INTO CACHE
   const value = useMemo(
     () => ({
       user,
       loading,
+      updateUser,
     }),
     [user, loading],
   );

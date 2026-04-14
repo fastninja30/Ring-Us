@@ -40,7 +40,7 @@ declare global {
 }
 
 export function Settings() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { userProfile } = useFriends();
   const { mode, toggleTheme } = useTheme();
   const muiTheme = useMuiTheme();
@@ -192,15 +192,14 @@ export function Settings() {
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, { displayName: trimmedName });
       
+      // Update user cache from AuthContext for username change
+      updateUser({ ...user, displayName: trimmedName } as any);
+
       setNameSuccess('Name updated successfully!');
       setIsEditingName(false);
       
       // Clear success message after a bit
       setTimeout(() => setNameSuccess(''), 3000);
-      
-      // Reload window to ensure auth context syncs properly everywhere
-      // A more robust app might use a custom event or context update function
-      setTimeout(() => window.location.reload(), 1000);
     } catch (err: any) {
       setNameError(err.message || 'Failed to update name.');
     } finally {
