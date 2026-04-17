@@ -15,7 +15,7 @@ import {
   useTheme as useMuiTheme,
   Divider,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { FaUserFriends } from 'react-icons/fa';
@@ -37,6 +37,37 @@ export function Navbar() {
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Ctrl (Windows/Linux) or Cmd (Mac)
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case '1':
+            e.preventDefault();
+            navigate('/alarm');
+            break;
+          case '2':
+            e.preventDefault();
+            navigate('/friends');
+            break;
+          case '3':
+            e.preventDefault();
+            navigate('/settings');
+            break;
+          case '4':
+            e.preventDefault();
+            navigate('/about');
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
 
   const handleSignOut = async () => {
     await signOut(auth);
