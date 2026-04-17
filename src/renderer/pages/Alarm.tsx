@@ -132,6 +132,7 @@ export function Alarm() {
   const [alarms, setAlarms] = useState<AlarmData[]>(loadAlarms);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showClearAllPrompt, setShowClearAllPrompt] = useState(false);
+  const [showClearInactivePrompt, setShowClearInactivePrompt] = useState(false);
   const [editingAlarm, setEditingAlarm] = useState<DisplayAlarm | null>(null);
   const [firingAlarm, setFiringAlarm] = useState<DisplayAlarm | null>(null);
   const [newHour, setNewHour] = useState('08');
@@ -430,6 +431,7 @@ export function Alarm() {
   };
 
   const handleDeleteInactiveAlarms = async () => {
+    setShowClearInactivePrompt(false);
     setDeleteAlarmsLoading(true);
     setDeleteAlarmsMessage('');
     try {
@@ -569,7 +571,7 @@ export function Alarm() {
             variant="outlined"
             color="error"
             startIcon={<IoMdTrash />}
-            onClick={handleDeleteInactiveAlarms}
+            onClick={() => setShowClearInactivePrompt(true)}
             disabled={deleteAlarmsLoading}
             size="small"
           >
@@ -1100,6 +1102,33 @@ export function Alarm() {
           </Button>
           <Button onClick={handleDeleteAllAlarms} color="error" variant="contained">
             Delete All
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Clear Inactive Confirmation Dialog */}
+      <Dialog
+        open={showClearInactivePrompt}
+        onClose={() => setShowClearInactivePrompt(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: alpha(theme.palette.background.paper, 0.95),
+            backdropFilter: 'blur(12px)',
+          },
+        }}
+      >
+        <DialogTitle>Clear Inactive Alarms?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete all inactive alarms? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowClearInactivePrompt(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteInactiveAlarms} color="error" variant="contained">
+            Delete Inactive
           </Button>
         </DialogActions>
       </Dialog>
