@@ -16,6 +16,11 @@ import {
   CircularProgress,
   useTheme,
   alpha,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import {
   IoMdCopy,
@@ -44,6 +49,7 @@ export function Friends() {
   const [success, setSuccess] = useState('');
   const [sending, setSending] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [friendToRemove, setFriendToRemove] = useState<{uid: string, name: string} | null>(null);
 
   const handleSendRequest = async () => {
     if (!friendCode.trim()) return;
@@ -85,11 +91,18 @@ export function Friends() {
     }
   };
 
-  const handleRemoveFriend = async (uid: string) => {
+  const confirmRemoveFriend = (uid: string, name: string) => {
+    setFriendToRemove({ uid, name });
+  };
+
+  const handleRemoveFriend = async () => {
+    if (!friendToRemove) return;
     try {
-      await removeFriend(uid);
+      await removeFriend(friendToRemove.uid);
     } catch (err: any) {
       setError(err.message || 'Failed to remove friend.');
+    } finally {
+      setFriendToRemove(null);
     }
   };
 
@@ -298,7 +311,7 @@ export function Friends() {
                   <ListItemText primary={friend.displayName} />
                   <ListItemSecondaryAction>
                     <IconButton
-                      onClick={() => handleRemoveFriend(friend.uid)}
+                      onClick={() => confirmRemoveFriend(friend.uid, friend.displayName)}
                       color="error"
                       size="small"
                     >
@@ -318,6 +331,26 @@ export function Friends() {
         onClose={() => setCopied(false)}
         message="Friend code copied!"
       />
+
+      <Dialog
+        open={!!friendToRemove}
+        onClose={() => setFriendToRemove(null)}
+      >
+        <DialogTitle>Remove Friend</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to remove {friendToRemove?.name} from your friends list?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setFriendToRemove(null)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleRemoveFriend} color="error" variant="contained">
+            Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

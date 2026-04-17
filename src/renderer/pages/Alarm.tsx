@@ -30,6 +30,7 @@ import {
   MenuItem,
   useTheme,
   alpha,
+  Alert,
 } from '@mui/material';
 import {
   IoMdAdd,
@@ -138,6 +139,8 @@ export function Alarm() {
   const [newDays, setNewDays] = useState<number[]>([]);
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [deleteAlarmsLoading, setDeleteAlarmsLoading] = useState(false);
+  const [deleteAlarmsMessage, setDeleteAlarmsMessage] = useState('');
   const firedAlarmsRef = useRef<Set<string>>(new Set());
   const audioContextRef = useRef<AudioContext | null>(null);
   const theme = useTheme();
@@ -173,6 +176,15 @@ export function Alarm() {
       setCurrentTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Listen to storage events to keep alarms synced across components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setAlarms(loadAlarms());
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Check alarms every second (both local and shared)
@@ -390,6 +402,57 @@ export function Alarm() {
     }
   };
 
+  const handleDeleteAllAlarms = async () => {
+    setDeleteAlarmsLoading(true);
+    setDeleteAlarmsMessage('');
+    try {
+      localStorage.removeItem('ringus-alarms');
+      setAlarms([]);
+      window.dispatchEvent(new Event('storage'));
+
+      for (const alarm of sharedAlarms) {
+        if (alarm.ownerId === user?.uid) {
+          await deleteSharedAlarm(alarm.id);
+        } else {
+          await leaveSharedAlarm(alarm.id);
+        }
+      }
+      setDeleteAlarmsMessage('All alarms deleted successfully.');
+    } catch (err: any) {
+      setDeleteAlarmsMessage(err.message || 'Failed to delete all alarms.');
+    } finally {
+      setDeleteAlarmsLoading(false);
+      setTimeout(() => setDeleteAlarmsMessage(''), 3000);
+    }
+  };
+
+  const handleDeleteInactiveAlarms = async () => {
+    setDeleteAlarmsLoading(true);
+    setDeleteAlarmsMessage('');
+    try {
+      const activeAlarms = alarms.filter((a) => a.enabled);
+      setAlarms(activeAlarms);
+      saveAlarms(activeAlarms);
+      window.dispatchEvent(new Event('storage'));
+
+      for (const alarm of sharedAlarms) {
+        if (!alarm.enabled) {
+          if (alarm.ownerId === user?.uid) {
+            await deleteSharedAlarm(alarm.id);
+          } else {
+            await leaveSharedAlarm(alarm.id);
+          }
+        }
+      }
+      setDeleteAlarmsMessage('Inactive alarms deleted successfully.');
+    } catch (err: any) {
+      setDeleteAlarmsMessage(err.message || 'Failed to delete inactive alarms.');
+    } finally {
+      setDeleteAlarmsLoading(false);
+      setTimeout(() => setDeleteAlarmsMessage(''), 3000);
+    }
+  };
+
   const handleToggleAlarm = (alarm: DisplayAlarm) => {
     if (alarm.isShared) {
       toggleSharedAlarm(alarm.id, !alarm.enabled);
@@ -488,6 +551,8 @@ export function Alarm() {
           alignItems: 'center',
           justifyContent: 'space-between',
           mb: 2,
+          flexWrap: 'wrap',
+          gap: 2,
         }}
       >
         <Typography
@@ -496,17 +561,43 @@ export function Alarm() {
         >
           <IoMdAlarm /> Alarms
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<IoMdAdd />}
-          onClick={() => setShowAddDialog(true)}
-          sx={{
-            width: { xs: '50%', sm: 'auto' },
-          }}
-        >
-          Add Alarm
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<IoMdTrash />}
+            onClick={handleDeleteInactiveAlarms}
+            disabled={deleteAlarmsLoading}
+            size="small"
+          >
+            Clear Inactive
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<IoMdTrash />}
+            onClick={handleDeleteAllAlarms}
+            disabled={deleteAlarmsLoading}
+            size="small"
+          >
+            Clear All
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<IoMdAdd />}
+            onClick={() => setShowAddDialog(true)}
+            size="small"
+          >
+            Add Alarm
+          </Button>
+        </Box>
       </Box>
+
+      {deleteAlarmsMessage && (
+        <Alert severity={deleteAlarmsMessage.includes('Failed') ? 'error' : 'success'} sx={{ mb: 2 }}>
+          {deleteAlarmsMessage}
+        </Alert>
+      )}
 
       {/* Alarm list */}
       {allAlarms.length === 0 ? (

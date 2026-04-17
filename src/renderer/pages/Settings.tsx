@@ -19,6 +19,7 @@ import {
   IoMdCheckmarkCircle,
   IoMdCopy,
   IoMdCreate,
+  IoMdTrash,
 } from 'react-icons/io';
 import {
   PhoneAuthProvider,
@@ -32,6 +33,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { auth, db } from '../firebaseConfig';
 import { useAuth } from '../contexts/AuthContext';
 import { useFriends } from '../contexts/FriendsContext';
+import { useSharedAlarms } from '../hooks/useSharedAlarms';
 
 declare global {
   interface Window {
