@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogContentText,
   DialogActions,
   Paper,
   List,
@@ -130,6 +131,7 @@ export function Alarm() {
 
   const [alarms, setAlarms] = useState<AlarmData[]>(loadAlarms);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showClearAllPrompt, setShowClearAllPrompt] = useState(false);
   const [editingAlarm, setEditingAlarm] = useState<DisplayAlarm | null>(null);
   const [firingAlarm, setFiringAlarm] = useState<DisplayAlarm | null>(null);
   const [newHour, setNewHour] = useState('08');
@@ -403,6 +405,7 @@ export function Alarm() {
   };
 
   const handleDeleteAllAlarms = async () => {
+    setShowClearAllPrompt(false);
     setDeleteAlarmsLoading(true);
     setDeleteAlarmsMessage('');
     try {
@@ -576,7 +579,7 @@ export function Alarm() {
             variant="contained"
             color="error"
             startIcon={<IoMdTrash />}
-            onClick={handleDeleteAllAlarms}
+            onClick={() => setShowClearAllPrompt(true)}
             disabled={deleteAlarmsLoading}
             size="small"
           >
@@ -1070,6 +1073,33 @@ export function Alarm() {
             }}
           >
             Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Clear All Confirmation Dialog */}
+      <Dialog
+        open={showClearAllPrompt}
+        onClose={() => setShowClearAllPrompt(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: alpha(theme.palette.background.paper, 0.95),
+            backdropFilter: 'blur(12px)',
+          },
+        }}
+      >
+        <DialogTitle>Clear All Alarms?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete all alarms? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowClearAllPrompt(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteAllAlarms} color="error" variant="contained">
+            Delete All
           </Button>
         </DialogActions>
       </Dialog>
